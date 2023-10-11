@@ -26,7 +26,7 @@ final class RestClientTests: XCTestCase {
     func testErrors() {
         let urlMalformed = RestingError.urlMalformed
         XCTAssertEqual(urlMalformed.errorDescription, "URL malformed.", "RestingError messages don't match!")
-        let statusCode = RestingError.statusCode(403)
+        let statusCode = RestingError.statusCode(403, nil)
         XCTAssertEqual(statusCode.errorDescription, "HTTP returned unxpected 403 code.", "RestingError messages don't match!")
         let unknown = RestingError.unknown
         XCTAssertEqual(unknown.errorDescription, "Unknown error.", "RestingError messages don't match!")
@@ -35,7 +35,7 @@ final class RestClientTests: XCTestCase {
     func testDataWithURLResponseWithFailure() {
         let dataWithURLResponse = DataWithURLResponse(data: Data(), urlResponse: URLResponse())
         do {
-            let _:MockedModel = try dataWithURLResponse.createResponse()
+            _ = try dataWithURLResponse.createResponse()
             XCTFail("Creating response should have been failed!")
         } catch RestingError.unknown {
         } catch {
@@ -53,7 +53,7 @@ final class RestClientTests: XCTestCase {
         let restClient = RestClient(sessionConfiguration: configuration)
         let configuration = RequestConfiguration(urlString: "http://www.example.com")
 
-        let response: MockedModel = try await restClient.fetch(configuration: configuration)
+        let response: MockedModel = try await restClient.fetch(with: configuration)
 
         XCTAssertEqual(response.title, "Title Example", "Response data don't match the example data!")
     }
@@ -71,7 +71,7 @@ final class RestClientTests: XCTestCase {
 
         let expectation = self.expectation(description: "api")
 
-        let publisher: AnyPublisher<MockedModel, Error> = restClient.publisher(configuration: configuration)
+        let publisher: AnyPublisher<MockedModel, Error> = restClient.publisher(with: configuration)
         publisher
             .receive(on: RunLoop.main)
             .sink { completion in
@@ -100,7 +100,7 @@ final class RestClientTests: XCTestCase {
         let configuration = RequestConfiguration(urlString: "http://www.example.com")
 
         do {
-            let _:MockedModel = try await restClient.fetch(configuration: configuration)
+            let _:MockedModel = try await restClient.fetch(with: configuration)
             XCTFail("Fetching should have been failed with a status code!!")
         } catch RestingError.statusCode {
 
@@ -120,7 +120,7 @@ final class RestClientTests: XCTestCase {
 
         let expectation = self.expectation(description: "api")
 
-        let publisher: AnyPublisher<MockedModel, Error> = restClient.publisher(configuration: configuration)
+        let publisher: AnyPublisher<MockedModel, Error> = restClient.publisher(with: configuration)
         publisher
             .receive(on: RunLoop.main)
             .sink { completion in

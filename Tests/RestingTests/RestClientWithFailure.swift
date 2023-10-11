@@ -30,7 +30,7 @@ final class RestClientWithFailure: XCTestCase {
 
         let expectation = self.expectation(description: "api")
 
-        let publisher: AnyPublisher<MockedModel, Error> = restClient.publisher(configuration: configuration)
+        let publisher: AnyPublisher<MockedModel, Error> = restClient.publisher(with: configuration)
         publisher
             .receive(on: RunLoop.main)
             .sink { completion in

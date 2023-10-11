@@ -89,7 +89,7 @@ final class RequestConfigurationTests: XCTestCase {
             "\($0.key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
         }.sorted()
 
-        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .post, parameters: parameters, bodyEncoding: .urlEncoded)
+        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .post, parameters: parameters, encoding: .urlEncoded)
         let request = try requestConfiguration.createURLRequest()
 
         XCTAssertEqual(request.httpMethod, "POST")
@@ -105,7 +105,7 @@ final class RequestConfigurationTests: XCTestCase {
             "\($0.key)=\($0.value)"
         }.sorted()
 
-        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .post, parameters: parameters, bodyEncoding: .json)
+        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .post, parameters: parameters, encoding: .json)
         let request = try requestConfiguration.createURLRequest()
 
         XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
