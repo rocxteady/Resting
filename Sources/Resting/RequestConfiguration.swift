@@ -8,7 +8,7 @@
 import Foundation
 
 /// HTTP request methods.
-enum HTTPMethod: String {
+public enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
@@ -16,7 +16,7 @@ enum HTTPMethod: String {
 }
 
 /// Represents encoding types for the HTTP request.
-enum HTTPEncoding {
+public enum HTTPEncoding {
     case json, urlEncoded
 }
 
@@ -47,7 +47,7 @@ public struct RequestConfiguration {
     ///   - parameters: The parameters to be included in the request. Default is `nil`.
     ///   - headers: Additional HTTP headers to include in the request. Default is `nil`.
     ///   - encofing: The encoding for the request. Default is `.urlEncoded`.
-    init(urlString: String, method: HTTPMethod = .get, parameters: [String: Any]? = nil, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
+    public init(urlString: String, method: HTTPMethod = .get, parameters: [String: Any]? = nil, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
         self.urlString = urlString
         self.method = method
         self.parameters = parameters

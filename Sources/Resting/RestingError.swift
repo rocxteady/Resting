@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents errors related to the `RestClient` operations.
-enum RestingError: LocalizedError {
+public enum RestingError: LocalizedError {
     /// Represents a malformed URL error.
     case urlMalformed
 
@@ -21,7 +21,7 @@ enum RestingError: LocalizedError {
     /// This can be useful for displaying the error message to the user.
     case unknown
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .urlMalformed:
             NSLocalizedString("restingerror.urlMalformed", bundle: .module, comment: "")
