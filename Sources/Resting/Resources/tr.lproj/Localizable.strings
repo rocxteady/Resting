@@ -1,0 +1,11 @@
+/* 
+  Localizable.strings
+  
+
+  Created by Ulaş Sancak on 1.10.2023.
+  
+*/
+
+"restingerror.urlMalformed" = "URL hatalı.";
+"restingerror.statusCode" = "HTTP bekleyen bir %i kodu döndü.";
+"restingerror.unknown" = "Bilinmeyen hata.";

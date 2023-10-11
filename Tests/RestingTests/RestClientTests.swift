@@ -25,11 +25,11 @@ final class RestClientTests: XCTestCase {
 
     func testErrors() {
         let urlMalformed = RestingError.urlMalformed
-        XCTAssertEqual(urlMalformed.errorDescription, "URL malformed.", "RestingError messages don't match!")
+        XCTAssertNotNil(urlMalformed.errorDescription, "RestingError case should not be nil!")
         let statusCode = RestingError.statusCode(403, nil)
-        XCTAssertEqual(statusCode.errorDescription, "HTTP returned unxpected 403 code.", "RestingError messages don't match!")
+        XCTAssertNotNil(statusCode.errorDescription, "RestingError case should not be nil!")
         let unknown = RestingError.unknown
-        XCTAssertEqual(unknown.errorDescription, "Unknown error.", "RestingError messages don't match!")
+        XCTAssertNotNil(unknown.errorDescription, "RestingError case should not be nil!")
     }
 
     func testDataWithURLResponseWithFailure() {

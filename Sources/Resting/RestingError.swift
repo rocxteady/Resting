@@ -24,11 +24,11 @@ enum RestingError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .urlMalformed:
-            "URL malformed."
+            NSLocalizedString("restingerror.urlMalformed", bundle: .module, comment: "")
         case .statusCode(let code, _):
-            "HTTP returned unxpected \(code) code."
+            String(format: NSLocalizedString("restingerror.statusCode", bundle: .module, comment: ""), code)
         case .unknown:
-            "Unknown error."
+            NSLocalizedString("restingerror.unknown", bundle: .module, comment: "")
         }
     }
 }

@@ -1,0 +1,11 @@
+/* 
+  Localizable.strings
+  
+
+  Created by Ulaş Sancak on 1.10.2023.
+  
+*/
+
+"restingerror.urlMalformed" = "URL malformed.";
+"restingerror.statusCode" = "HTTP returned unxpected %i code.";
+"restingerror.unknown" = "Unknown error.";
