@@ -13,10 +13,11 @@ A Swift package offering a simplified interface for HTTP REST requests using bot
 
 ## Installation
 
-Add this Swift package to your project using its repository URL:
-
+You can add the package to the dependencies value of your Package.swift
 ```
-https://github.com/rocxteady/Resting.git
+dependencies: [
+    .package(url: "https://github.com/rocxteady/Resting.git", .upToNextMajor(from: "0.0.1"))
+]
 ```
 
 ## Usage
