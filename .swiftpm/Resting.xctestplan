@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "2F09BA95-37C8-45CB-B9D0-EB450F687748",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:",
+          "identifier" : "Resting",
+          "name" : "Resting"
+        }
+      ]
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "RestingTests",
+        "name" : "RestingTests"
+      }
+    }
+  ],
+  "version" : 1
+}
