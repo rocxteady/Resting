@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct MockedModel: Decodable {
+struct MockedModel: Codable {
     let title: String
 }

@@ -31,6 +31,17 @@ final class RequestConfigurationTests: XCTestCase {
         }
     }
 
+    func testCreatingURLConfigurationWithParameterTypeFailure() throws {
+        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .get, body: Data())
+        do {
+            _ = try requestConfiguration.createURLRequest()
+            XCTFail("Creating URL Configuration should have been failed!")
+        } catch RestingError.wrongParameterType {
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
     func testCreatingURLRequestWithGet() throws {
         let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .get)
         let request = try requestConfiguration.createURLRequest()
@@ -117,4 +128,43 @@ final class RequestConfigurationTests: XCTestCase {
 
         XCTAssertEqual(parametersFromRequest, queryArray)
     }
+
+    func testCreatingURLRequestWithURLEncodedData() throws {
+        let parameters = ["key": "value", "d": "d", "b": "b", "c": "c", "a": "a", "e": "e", "some_key": "ş"]
+        let queryArray = parameters.map {
+            "\($0.key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
+        }.sorted()
+        let data = queryArray.joined(separator: "&").data(using: .utf8)
+
+        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .post, body: data, encoding: .urlEncoded)
+        let request = try requestConfiguration.createURLRequest()
+
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/x-www--form-urlencoded")
+        XCTAssertNotNil(request.httpBody)
+        let queryArrayFromRequest = String(data: request.httpBody!, encoding: .utf8)?.components(separatedBy: "&").sorted()
+        XCTAssertEqual(queryArrayFromRequest, queryArray)
+    }
+
+
+    func testCreatingURLRequestiWithJSONData() throws {
+        let parameters: [String: Any] = ["key": "value", "some_key": "ş"]
+        let data = try JSONSerialization.data(withJSONObject: parameters)
+        let queryArray = parameters.map {
+            "\($0.key)=\($0.value)"
+        }.sorted()
+
+        let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .post, body: data, encoding: .json)
+        let request = try requestConfiguration.createURLRequest()
+
+        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
+        XCTAssertNotNil(request.httpBody)
+        let parametersFromRequest = (try JSONSerialization.jsonObject(with: request.httpBody!) as! [String: Any])
+            .map {
+                "\($0.key)=\($0.value)"
+            }.sorted()
+
+        XCTAssertEqual(parametersFromRequest, queryArray)
+    }
+
 }

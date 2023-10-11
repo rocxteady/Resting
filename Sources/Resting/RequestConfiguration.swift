@@ -31,26 +31,56 @@ private enum ContentType: String {
     case json = "application/json"
 }
 
+private enum ParameterType {
+    case object([String: Any])
+    case data(Data)
+}
+
 /// Represents the configuration for a RESTful HTTP request.
 public struct RequestConfiguration {
     let urlString: String
     let method: HTTPMethod
-    let parameters: [String: Any]?
     let headers: [String: String]?
     let encoding: HTTPEncoding
+
+    private let parameterType: ParameterType?
 
     /// Initializes a new RequestConfiguration instance.
     ///
     /// - Parameters:
     ///   - urlString: The URL string for the request.
     ///   - method: The HTTP method to use. Default is `.get`.
-    ///   - parameters: The parameters to be included in the request. Default is `nil`.
+    ///   - parameters: The parameters dictionary to be included in the request. Default is `nil`.
     ///   - headers: Additional HTTP headers to include in the request. Default is `nil`.
     ///   - encofing: The encoding for the request. Default is `.urlEncoded`.
-    public init(urlString: String, method: HTTPMethod = .get, parameters: [String: Any]? = nil, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
+    public init(urlString: String, method: HTTPMethod = .get, parameters: [String: Any]?, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
         self.urlString = urlString
         self.method = method
-        self.parameters = parameters
+        self.parameterType = if let parameters {
+            .object(parameters)
+        } else {
+            nil
+        }
+        self.headers = headers
+        self.encoding = encoding
+    }
+
+    /// Initializes a new RequestConfiguration instance.
+    ///
+    /// - Parameters:
+    ///   - urlString: The URL string for the request.
+    ///   - method: The HTTP method to use. Default is `.get`.
+    ///   - body: The parameters as `Data` to be included in the reques body. Default is `nil`.
+    ///   - headers: Additional HTTP headers to include in the request. Default is `nil`.
+    ///   - encofing: The encoding for the request. Default is `.urlEncoded`.
+    public init(urlString: String, method: HTTPMethod = .post, body: Data? = nil, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
+        self.urlString = urlString
+        self.method = method
+        self.parameterType = if let body {
+            .data(body)
+        } else {
+            nil
+        }
         self.headers = headers
         self.encoding = encoding
     }
@@ -68,25 +98,38 @@ extension RequestConfiguration {
 
         var urlRequest: URLRequest
 
-        if let parameters = parameters {
+        if let parameterType = parameterType {
             switch (encoding, method) {
             case (_ , .get):
+                guard case .object(let parameters) = parameterType else {
+                    throw RestingError.wrongParameterType
+                }
                 urlComponents.queryItems = parameters.map {
                     URLQueryItem(name: $0.key, value: String(describing: $0.value))
                 }
                 urlRequest = URLRequest(url: try urlComponents.fullURL)
             case (.json, _):
                 urlRequest = URLRequest(url: try urlComponents.fullURL)
-                let jsonData = try JSONSerialization.data(withJSONObject: parameters)
-                urlRequest.httpBody = jsonData
+                switch parameterType {
+                case .object(let parameters):
+                    let jsonData = try JSONSerialization.data(withJSONObject: parameters)
+                    urlRequest.httpBody = jsonData
+                case .data(let body):
+                    urlRequest.httpBody = body
+                }
                 urlRequest.addValue(ContentType.json.rawValue, forHTTPHeaderField: HTTPHeaderKeys.contentType.rawValue)
             case (.urlEncoded, _):
                 urlRequest = URLRequest(url: try urlComponents.fullURL)
-                urlComponents.queryItems = parameters.map {
-                    URLQueryItem(name: $0.key, value: String(describing: $0.value))
+                switch parameterType {
+                case .object(let parameters):
+                    urlComponents.queryItems = parameters.map {
+                        URLQueryItem(name: $0.key, value: String(describing: $0.value))
+                    }
+                    let bodyString = urlComponents.percentEncodedQuery
+                    urlRequest.httpBody = bodyString?.data(using: .utf8)
+                case .data(let body):
+                    urlRequest.httpBody = body
                 }
-                let bodyString = urlComponents.percentEncodedQuery
-                urlRequest.httpBody = bodyString?.data(using: .utf8)
                 urlRequest.addValue(ContentType.urlEncoded.rawValue, forHTTPHeaderField: HTTPHeaderKeys.contentType.rawValue)
             }
         } else {

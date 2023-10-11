@@ -8,4 +8,5 @@
 
 "restingerror.urlMalformed" = "URL hatalı.";
 "restingerror.statusCode" = "HTTP bekleyen bir %i kodu döndü.";
+"restingerror.wrongParameterType" = "Yanlış parametre tipi. Parametre olarak Data veri tipini kullanamazsınız, onun yerine veri tipi olarak Dictionary kullanın.";
 "restingerror.unknown" = "Bilinmeyen hata.";

@@ -8,4 +8,5 @@
 
 "restingerror.urlMalformed" = "URL malformed.";
 "restingerror.statusCode" = "HTTP returned unxpected %i code.";
+"restingerror.wrongParameterType" = "Wrong parameter type. You can't use Data type as parameter with a 'GET' request. Use Dictionary as type instead.";
 "restingerror.unknown" = "Unknown error.";

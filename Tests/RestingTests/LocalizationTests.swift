@@ -20,7 +20,7 @@ final class LocalizationTests: XCTestCase {
             let restingerrorUrlMalformed = bundle.localizedString(forKey: "restingerror.urlMalformed", value: nil, table: nil)
 
             XCTAssertFalse(restingerrorUrlMalformed.isEmpty)
-            XCTAssertNotEqual(restingerrorUrlMalformed, "generic.restingerror.urlMalformed")
+            XCTAssertNotEqual(restingerrorUrlMalformed, "restingerror.urlMalformed")
 
             let restingerrorStatusCode = bundle.localizedString(forKey: "restingerror.statusCode", value: nil, table: nil)
 
@@ -30,7 +30,12 @@ final class LocalizationTests: XCTestCase {
             let restingerrorUnknown = bundle.localizedString(forKey: "restingerror.unknown", value: nil, table: nil)
 
             XCTAssertFalse(restingerrorUnknown.isEmpty)
-            XCTAssertNotEqual(restingerrorUnknown, "generic.restingerror.urlMalformed")
+            XCTAssertNotEqual(restingerrorUnknown, "restingerror.urlMalformed")
+
+            let restingerrorWrongParameterType = bundle.localizedString(forKey: "restingerror.wrongParameterType", value: nil, table: nil)
+
+            XCTAssertFalse(restingerrorWrongParameterType.isEmpty)
+            XCTAssertNotEqual(restingerrorWrongParameterType, "restingerror.wrongParameterType")
         }
     }
 }

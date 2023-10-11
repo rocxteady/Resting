@@ -16,6 +16,8 @@ public enum RestingError: LocalizedError {
     /// Contains the status code and, optionally, the returned data.
     case statusCode(Int, Data?)
 
+    case wrongParameterType
+
     /// Provides a human-readable description for the error.
     ///
     /// This can be useful for displaying the error message to the user.
@@ -27,6 +29,8 @@ public enum RestingError: LocalizedError {
             NSLocalizedString("restingerror.urlMalformed", bundle: .module, comment: "")
         case .statusCode(let code, _):
             String(format: NSLocalizedString("restingerror.statusCode", bundle: .module, comment: ""), code)
+        case .wrongParameterType:
+            NSLocalizedString("restingerror.wrongParameterType", bundle: .module, comment: "")
         case .unknown:
             NSLocalizedString("restingerror.unknown", bundle: .module, comment: "")
         }

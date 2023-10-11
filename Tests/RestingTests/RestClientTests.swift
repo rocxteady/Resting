@@ -28,6 +28,8 @@ final class RestClientTests: XCTestCase {
         XCTAssertNotNil(urlMalformed.errorDescription, "RestingError case should not be nil!")
         let statusCode = RestingError.statusCode(403, nil)
         XCTAssertNotNil(statusCode.errorDescription, "RestingError case should not be nil!")
+        let wrongParameterType = RestingError.wrongParameterType
+        XCTAssertNotNil(wrongParameterType.errorDescription, "RestingError case should not be nil!")
         let unknown = RestingError.unknown
         XCTAssertNotNil(unknown.errorDescription, "RestingError case should not be nil!")
     }
@@ -51,7 +53,7 @@ final class RestClientTests: XCTestCase {
             return (response, exampleData)
         }
         let restClient = RestClient(sessionConfiguration: configuration)
-        let configuration = RequestConfiguration(urlString: "http://www.example.com")
+        let configuration = RequestConfiguration(urlString: "http://www.example.com", parameters: nil)
 
         let response: MockedModel = try await restClient.fetch(with: configuration)
 
