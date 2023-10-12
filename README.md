@@ -31,7 +31,8 @@ import Resting
 ### 2. Create an instance of the `RestClient`
 
 ```
-let restClient = RestClient()
+let clientConfiguration = RestClientConfiguration(sessionConfiguration: .default, jsonDecoder: .init())
+let restClient = RestClient(configuration: clientConfiguration)
 ```
 
 ### 3. Configure your request
@@ -48,28 +49,47 @@ let requestConfig = RequestConfiguration(
 #### Using async/await:
 
 ```
+// Decodable as response
 do {
-    let data: MockedModel = try await restClient.fetch(with: requestConfig)
+    let data: YourDecodableModel = try await restClient.fetch(with: requestConfig)
     // Handle the data
 } catch {
     // Handle the error
 }
+
+// Data as response
+do {
+    let data = try await restClient.fetch(with: requestConfig)
+    // Handle the data
+} catch {
+    // Handle the error
+}
+
 ```
 
 #### Using Combine:
 
 ```
+// Decodable as response
 let cancellable :AnyPublisher<YourDecodableModel, Error> = restClient.publisher(with: requestConfig)
 cancellable.sink { completion in
     // Handle completion or error
 } receiveValue: { (data: YourDecodableModel) in
     // Handle the data
 }
+
+// Data as response
+restClient.publisher(with: requestConfig)
+.sink { completion in
+    // Handle completion or error
+} receiveValue: { data in
+    // Handle the data
+}
 ```
 
 ## Error Handling
 
-The package provides a dedicated `RestingError` enum to handle errors gracefully. It includes cases like `.urlMalformed`, `.statusCode`, and `.unknown`. Make sure to incorporate these in your error handling logic.
+The package provides a dedicated `RestingError` enum to handle errors gracefully. It includes cases like `.urlMalformed`, `.statusCode`, `.wrongParameterType` and `.unknown`. Make sure to incorporate these in your error handling logic.
 
 ## Localizations
 
