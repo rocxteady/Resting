@@ -1,4 +1,5 @@
 # Resting
+[![Swift](https://github.com/rocxteady/Resting/actions/workflows/swift.yml/badge.svg)](https://github.com/rocxteady/Resting/actions/workflows/swift.yml)
 
 A Swift package offering a simplified interface for HTTP REST requests using both Combine and async/await patterns.
 
