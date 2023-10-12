@@ -52,7 +52,7 @@ final class RestClientTests: XCTestCase {
             let exampleData = exampleString.data(using: .utf8)
             return (response, exampleData)
         }
-        let restClient = RestClient(sessionConfiguration: configuration)
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
         let configuration = RequestConfiguration(urlString: "http://www.example.com", parameters: nil)
 
         let response: MockedModel = try await restClient.fetch(with: configuration)
@@ -68,7 +68,7 @@ final class RestClientTests: XCTestCase {
             return (response, exampleData)
         }
 
-        let restClient = RestClient(sessionConfiguration: configuration)
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
         let configuration = RequestConfiguration(urlString: "http://www.example.com")
 
         let expectation = self.expectation(description: "api")
@@ -98,7 +98,7 @@ final class RestClientTests: XCTestCase {
             let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 403, httpVersion: nil, headerFields: nil)
             return (response, nil)
         }
-        let restClient = RestClient(sessionConfiguration: configuration)
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
         let configuration = RequestConfiguration(urlString: "http://www.example.com")
 
         do {
@@ -117,7 +117,7 @@ final class RestClientTests: XCTestCase {
             return (response, nil)
         }
 
-        let restClient = RestClient(sessionConfiguration: configuration)
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
         let configuration = RequestConfiguration(urlString: "http://\u{FFFD}\u{FFFE}")
 
         let expectation = self.expectation(description: "api")

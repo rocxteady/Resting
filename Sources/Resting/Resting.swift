@@ -2,26 +2,41 @@
 // https://docs.swift.org/swift-book
 import Foundation
 
-/// Represents a client for making RESTful network requests.
-public class RestClient {
-    private let session: URLSession
-    private let jsonEncoder: JSONEncoder
-    private let jsonDecoder: JSONDecoder
+/// Represents the configuration for a `RestClient` instance.
+///
+/// Encapsulates the `URLSessionConfiguration` and `JSONDecoder` to be used by the `RestClient`.
+public struct RestClientConfiguration {
+    /// The session configuration for network requests.
+    let sessionConfiguration: URLSessionConfiguration
 
-    /// Initializes a new RestClient.
+    /// The JSON decoder for decoding responses.
+    let jsonDecoder: JSONDecoder
+
+    /// Creates a new `RestClientConfiguration` instance with the specified `URLSessionConfiguration` and `JSONDecoder`.
     ///
     /// - Parameters:
-    ///   - sessionConfiguration: The configuration used for the `URLSession`. Default is `.default`.
-    ///   - jsonEncoder: A `JSONEncoder` instance. Default is a new instance.
-    ///   - jsonDecoder: A `JSONDecoder` instance. Default is a new instance.
-    public init(
-        sessionConfiguration: URLSessionConfiguration = .default,
-        jsonEncoder: JSONEncoder = .init(),
-        jsonDecoder: JSONDecoder = .init()
-    ) {
-        self.session = URLSession(configuration: sessionConfiguration)
-        self.jsonEncoder = JSONEncoder()
-        self.jsonDecoder = JSONDecoder()
+    ///   - sessionConfiguration: The session configuration for network requests, defaults to `.default`.
+    ///   - jsonDecoder: The JSON decoder for decoding responses, defaults to a new `JSONDecoder` instance.
+    public init(sessionConfiguration: URLSessionConfiguration = .default, jsonDecoder: JSONDecoder = .init()) {
+        self.sessionConfiguration = sessionConfiguration
+        self.jsonDecoder = jsonDecoder
+    }
+}
+
+/// Represents a client for making RESTful network requests.
+/// ///
+/// This client utilizes a `RestClientConfiguration` to configure its behavior, including the session configuration and JSON decoding.
+public class RestClient {
+    private let session: URLSession
+    private let clientConfiguration: RestClientConfiguration
+
+    /// Creates a new `RestClient` instance with the specified `RestClientConfiguration`.
+    ///
+    /// - Parameters:
+    ///   - configuration: The configuration used to set up the client, defaults to a new `RestClientConfiguration` instance with a default `URLSessionConfiguration`.
+    public init(configuration: RestClientConfiguration = .init(sessionConfiguration: .default)) {
+        self.clientConfiguration = configuration
+        self.session = URLSession(configuration: configuration.sessionConfiguration)
     }
 }
 
@@ -45,7 +60,7 @@ extension RestClient {
     /// - Throws: Throws an error if the request fails, if the data can't be decoded, or if the response can't be created.
     public func fetch<T: Decodable>(with configuration: RequestConfiguration) async throws -> T {
         let data = try await fetch(with: configuration)
-        return try JSONDecoder().decode(T.self, from: data)
+        return try clientConfiguration.jsonDecoder.decode(T.self, from: data)
     }
 }
 
@@ -74,9 +89,10 @@ extension RestClient {
     /// - Parameter configuration: The configuration for the network request.
     /// - Returns: An `AnyPublisher` that emits a `Decodable` model or an error.
     public func publisher<T: Decodable>(with configuration: RequestConfiguration) -> AnyPublisher<T, Error> {
-        publisher(with: configuration)
+        let jsonDecoder = clientConfiguration.jsonDecoder
+        return publisher(with: configuration)
             .tryMap { data in
-                return try JSONDecoder().decode(T.self, from: data)
+                return try jsonDecoder.decode(T.self, from: data)
             }.eraseToAnyPublisher()
     }
 }

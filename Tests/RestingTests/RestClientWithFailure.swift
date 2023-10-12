@@ -25,7 +25,7 @@ final class RestClientWithFailure: XCTestCase {
     }
 
     func testPublisherWithFailure() throws {
-        let restClient = RestClient(sessionConfiguration: configuration)
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
         let configuration = RequestConfiguration(urlString: "http://www.example.com")
 
         let expectation = self.expectation(description: "api")

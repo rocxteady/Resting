@@ -16,6 +16,8 @@ public enum RestingError: LocalizedError {
     /// Contains the status code and, optionally, the returned data.
     case statusCode(Int, Data?)
 
+    /// Represents an incorrect parameter type error.
+    /// This error is thrown when the parameter type is `Data` on a `GET` request..
     case wrongParameterType
 
     /// Provides a human-readable description for the error.
