@@ -9,7 +9,8 @@ A Swift package offering a simplified interface for HTTP REST requests using bot
 - Seamless error handling with specific `RestingError` cases
 - Asynchronous request handling using Swift's new `async/await` feature
 - Reactive request handling with Combine framework publishers
-- Handle responses with both `Data`and `Decodable`.
+- Send parameters as either `Dictionary` or `Data`
+- Handle responses with both `Data`and `Decodable`
 
 ## Installation
 
