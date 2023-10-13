@@ -1,5 +1,5 @@
 //
-//  RestClientWithFailure.swift
+//  RestClientWithFailureTests.swift
 //  
 //
 //  Created by Ulaş Sancak on 11.10.2023.
@@ -9,7 +9,7 @@ import XCTest
 @testable import Resting
 import Combine
 
-final class RestClientWithFailure: XCTestCase {
+final class RestClientWithFailureTests: XCTestCase {
 
     private let configuration = URLSessionConfiguration.default
     private var cancellables = Set<AnyCancellable>()
