@@ -28,13 +28,13 @@ public enum RestingError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .urlMalformed:
-            NSLocalizedString("restingerror.urlMalformed", bundle: .module, comment: "")
+            return NSLocalizedString("restingerror.urlMalformed", bundle: .module, comment: "")
         case .statusCode(let code, _):
-            String(format: NSLocalizedString("restingerror.statusCode", bundle: .module, comment: ""), code)
+            return String(format: NSLocalizedString("restingerror.statusCode", bundle: .module, comment: ""), code)
         case .wrongParameterType:
-            NSLocalizedString("restingerror.wrongParameterType", bundle: .module, comment: "")
+            return NSLocalizedString("restingerror.wrongParameterType", bundle: .module, comment: "")
         case .unknown:
-            NSLocalizedString("restingerror.unknown", bundle: .module, comment: "")
+            return NSLocalizedString("restingerror.unknown", bundle: .module, comment: "")
         }
     }
 }

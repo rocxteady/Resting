@@ -56,10 +56,10 @@ public struct RequestConfiguration {
     public init(urlString: String, method: HTTPMethod = .get, parameters: [String: Any]?, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
         self.urlString = urlString
         self.method = method
-        self.parameterType = if let parameters {
-            .object(parameters)
+        if let parameters {
+            self.parameterType = .object(parameters)
         } else {
-            nil
+            self.parameterType = nil
         }
         self.headers = headers
         self.encoding = encoding
@@ -76,10 +76,10 @@ public struct RequestConfiguration {
     public init(urlString: String, method: HTTPMethod = .post, body: Data? = nil, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
         self.urlString = urlString
         self.method = method
-        self.parameterType = if let body {
-            .data(body)
+        if let body {
+            self.parameterType = .data(body)
         } else {
-            nil
+            self.parameterType = nil
         }
         self.headers = headers
         self.encoding = encoding
