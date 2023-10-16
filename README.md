@@ -18,7 +18,7 @@ A Swift package offering a simplified interface for HTTP REST requests using bot
 You can add the package to the dependencies value of your Package.swift
 ```
 dependencies: [
-    .package(url: "https://github.com/rocxteady/Resting.git", .upToNextMajor(from: "0.0.5"))
+    .package(url: "https://github.com/rocxteady/Resting.git", .upToNextMajor(from: "0.0.6"))
 ]
 ```
 
