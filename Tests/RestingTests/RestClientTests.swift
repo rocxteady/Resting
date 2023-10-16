@@ -69,7 +69,7 @@ final class RestClientTests: XCTestCase {
         }
 
         let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
-        let configuration = RequestConfiguration(urlString: "http://www.example.com")
+        let configuration = RequestConfiguration(urlString: "http://www.example.com", method: .get)
 
         let expectation = self.expectation(description: "api")
 
@@ -99,7 +99,7 @@ final class RestClientTests: XCTestCase {
             return (response, nil)
         }
         let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
-        let configuration = RequestConfiguration(urlString: "http://www.example.com")
+        let configuration = RequestConfiguration(urlString: "http://www.example.com", method: .get)
 
         do {
             let _:MockedModel = try await restClient.fetch(with: configuration)

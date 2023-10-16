@@ -49,7 +49,7 @@ final class RequestConfigurationTests: XCTestCase {
         XCTAssertEqual(request.httpMethod, "GET")
         XCTAssertNil(request.httpBody)
         XCTAssertEqual(request.url?.scheme, "http")
-        XCTAssertEqual(request.url?.host(), "www.example.com")
+        XCTAssertEqual(request.url?.host, "www.example.com")
     }
 
     func testCreatingURLRequestWithPUT() throws {
@@ -90,7 +90,7 @@ final class RequestConfigurationTests: XCTestCase {
         let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .get, parameters: parameters)
         let request = try requestConfiguration.createURLRequest()
 
-        let queryArrayFromRequest = request.url?.query()?.components(separatedBy: "&").sorted()
+        let queryArrayFromRequest = request.url?.query?.components(separatedBy: "&").sorted()
         XCTAssertEqual(queryArrayFromRequest, queryArray)
     }
 
