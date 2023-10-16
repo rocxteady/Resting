@@ -15,7 +15,7 @@ on:
 jobs:
   test:
 
-    runs-on: macos-13-large
+    runs-on: macos-13
     
     steps:
     - name: Select Xcode Version
@@ -27,12 +27,7 @@ jobs:
         xcodebuild \
           -scheme Resting \
           -sdk macosx14.0 \
-          -destination 'platform=macOS,arch=x86_64' \
-          test &&
-        xcodebuild \
-          -scheme Resting \
-          -sdk macosx14.0 \
-          -destination 'platform=macOS,arch=arm64' \
+          -destination 'platform=macOS' \
           test &&
         xcodebuild \
           -scheme Resting \
