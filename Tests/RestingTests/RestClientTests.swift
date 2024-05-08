@@ -119,9 +119,24 @@ final class RestClientTests: XCTestCase {
 
         do {
             let _: MockedModel = try await restClient.fetch(with: configuration)
-            XCTFail("Fetching should have been failed with a status code!!")
+            XCTFail("Downloading should have been failed with a status code!!")
         } catch RestingError.statusCode {
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
 
+    func testAsyncAwaitWithUnknownFailure() async throws {
+        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+            return (nil, nil)
+        }
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
+        let configuration = RequestConfiguration(urlString: "http://www.example.com", method: .get)
+
+        do {
+            let _: URL = try await restClient.download(with: configuration)
+            XCTFail("Downloading should have been failed with unknown case!")
+        } catch RestingError.unknown {
         } catch {
             XCTFail(error.localizedDescription)
         }

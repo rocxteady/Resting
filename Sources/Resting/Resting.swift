@@ -70,7 +70,7 @@ extension RestClient {
     /// - Throws: Throws an error if the request fails or if the response can't be created.
     public func download(with configuration: RequestConfiguration) async throws -> URL {
         let urlRequest = try configuration.createURLRequest()
-        let response = try await session.download(for: urlRequest)
+        let response = try await session.asyncDownload(for: urlRequest)
         return response.0
     }
 }

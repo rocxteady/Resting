@@ -47,4 +47,19 @@ final class RestClientWithFailureTests: XCTestCase {
 
         waitForExpectations(timeout: 1)
     }
+
+    func testAsyncAwaitWithFailure() async throws {
+        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+            let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 403, httpVersion: nil, headerFields: nil)
+            return (response, nil)
+        }
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
+        let configuration = RequestConfiguration(urlString: "http://www.example.com", method: .get)
+
+        do {
+            let _: URL = try await restClient.download(with: configuration)
+            XCTFail("Downloading should have been failed!")
+        } catch {
+        }
+    }
 }

@@ -15,9 +15,9 @@ extension URLSession {
     ///  - request: The `URLRequest` to be downloaded.
     ///  - Returns: A tuple containing the downloaded file's URL and its associated URL response.
     ///  - Throws: Any errors encountered during the download operation.
-    func download(for request: URLRequest) async throws -> (URL, URLResponse) {
+    func asyncDownload(for request: URLRequest) async throws -> (URL, URLResponse) {
         return try await withCheckedThrowingContinuation { continuation in
-            downloadTask(with: request) { url, response, error in
+            let task = downloadTask(with: request) { url, response, error in
                 guard let url, let response else {
                     if let error {
                         continuation.resume(throwing: error)
@@ -28,6 +28,7 @@ extension URLSession {
                 }
                 continuation.resume(returning: (url, response))
             }
+            task.resume()
         }
     }
 }
