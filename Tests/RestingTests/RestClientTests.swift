@@ -60,6 +60,22 @@ final class RestClientTests: XCTestCase {
         XCTAssertEqual(response.title, "Title Example", "Response data don't match the example data!")
     }
 
+    func testDownloadAsyncAwait() async throws {
+        let exampleString = "Text"
+        let exampleData = exampleString.data(using: .utf8)
+        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+            let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+            return (response, exampleData)
+        }
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
+        let configuration = RequestConfiguration(urlString: "http://www.example.com", parameters: nil)
+
+        let responseURL: URL = try await restClient.download(with: configuration)
+        let responseData = try Data(contentsOf: responseURL)
+
+        XCTAssertEqual(responseData, exampleData, "Downloaded file don't match the example file data!")
+    }
+
     func testPublisher() throws {
         MockedURLService.observer = { request -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)
@@ -102,7 +118,7 @@ final class RestClientTests: XCTestCase {
         let configuration = RequestConfiguration(urlString: "http://www.example.com", method: .get)
 
         do {
-            let _:MockedModel = try await restClient.fetch(with: configuration)
+            let _: MockedModel = try await restClient.fetch(with: configuration)
             XCTFail("Fetching should have been failed with a status code!!")
         } catch RestingError.statusCode {
 
