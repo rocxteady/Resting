@@ -62,6 +62,17 @@ extension RestClient {
         let data = try await fetch(with: configuration)
         return try clientConfiguration.jsonDecoder.decode(T.self, from: data)
     }
+
+    /// Downloads a file based on the provided request configuration.
+    ///
+    /// - Parameter configuration: The configuration for the network request.
+    /// - Returns: A `URL` to the downloaded file.
+    /// - Throws: Throws an error if the request fails or if the response can't be created.
+    public func download(with configuration: RequestConfiguration) async throws -> URL {
+        let urlRequest = try configuration.createURLRequest()
+        let response = try await session.asyncDownload(for: urlRequest)
+        return response.0
+    }
 }
 
 // MARK: Combine-based API functionality
