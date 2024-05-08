@@ -4,7 +4,7 @@
 name: Swift
 
 env:
-  XCODE_VERSION: "15.0"
+  XCODE_VERSION: "15.3"
   
 on:
   push:
@@ -15,7 +15,7 @@ on:
 jobs:
   test:
 
-    runs-on: macos-13
+    runs-on: macos-14
     
     steps:
     - name: Select Xcode Version
@@ -26,18 +26,22 @@ jobs:
       run: |
         xcodebuild \
           -scheme Resting \
-          -sdk macosx14.0 \
+          -sdk macosx14.4 \
           -destination 'platform=macOS' \
           test &&
         xcodebuild \
           -scheme Resting \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.0' \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.4' \
           test &&
         xcodebuild \
           -scheme Resting \
-          -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (41mm),OS=10.0' \
+          -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (41mm),OS=10.4' \
           test &&
-          xcodebuild \
+        xcodebuild \
           -scheme Resting \
-          -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation) (at 1080p),OS=17.0' \
+          -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation) (at 1080p),OS=17.4' \
+          test
+        xcodebuild \
+          -scheme Resting \
+          -destination 'platform=visionOS Simulator,name=Apple Vision Pro,OS=1.1' \
           test
