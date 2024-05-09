@@ -26,9 +26,13 @@ public struct RestClientConfiguration {
 /// Represents a client for making RESTful network requests.
 /// ///
 /// This client utilizes a `RestClientConfiguration` to configure its behavior, including the session configuration and JSON decoding.
-public class RestClient {
-    private let session: URLSession
+public class RestClient: NSObject {
+    private lazy var session: URLSession = URLSession(configuration: clientConfiguration.sessionConfiguration, delegate: self, delegateQueue: nil)
     private let clientConfiguration: RestClientConfiguration
+
+    private var downloadCompletion: ((URL?, Error?) -> Void)?
+    private var progress: ((Double) -> Void)?
+    private var downloadTask: URLSessionDownloadTask?
 
     /// Creates a new `RestClient` instance with the specified `RestClientConfiguration`.
     ///
@@ -36,7 +40,7 @@ public class RestClient {
     ///   - configuration: The configuration used to set up the client, defaults to a new `RestClientConfiguration` instance with a default `URLSessionConfiguration`.
     public init(configuration: RestClientConfiguration = .init(sessionConfiguration: .default)) {
         self.clientConfiguration = configuration
-        self.session = URLSession(configuration: configuration.sessionConfiguration)
+        super.init()
     }
 }
 
@@ -68,10 +72,57 @@ extension RestClient {
     /// - Parameter configuration: The configuration for the network request.
     /// - Returns: A `URL` to the downloaded file.
     /// - Throws: Throws an error if the request fails or if the response can't be created.
-    public func download(with configuration: RequestConfiguration) async throws -> URL {
-        let urlRequest = try configuration.createURLRequest()
-        let response = try await session.asyncDownload(for: urlRequest)
-        return response.0
+    public func download(with configuration: RequestConfiguration, completion: @escaping (URL?, Error?) -> Void, progress: ((Double) -> Void)? = nil) {
+        self.downloadCompletion = completion
+        self.progress = progress
+        do {
+            let urlRequest = try configuration.createURLRequest()
+            downloadTask = session.downloadTask(with: urlRequest)
+            downloadTask?.resume()
+        } catch {
+            completion(nil, error)
+            self.downloadCompletion = nil
+            self.progress = nil
+        }
+    }
+    
+    public func cancel() {
+        downloadTask?.cancel()
+    }
+}
+
+extension RestClient: URLSessionDownloadDelegate {    
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+        downloadCompletion?(nil, error)
+        downloadCompletion = nil
+        progress = nil
+    }
+    
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        defer {
+            self.downloadCompletion = nil
+            self.progress = nil
+        }
+        do {
+            let documentsURL = try
+                FileManager.default.url(for: .documentDirectory,
+                                        in: .userDomainMask,
+                                        appropriateFor: nil,
+                                        create: false)
+            let savedURL = documentsURL.appendingPathComponent(
+                location.lastPathComponent)
+            try FileManager.default.moveItem(at: location, to: savedURL)
+            downloadCompletion?(savedURL, nil)
+        } catch {
+            downloadCompletion?(nil, error)
+        }
+    }
+    
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        guard downloadTask == self.downloadTask else { return }
+        let bytesWritten = Double(bytesWritten)
+        let totalBytesWritten = Double(totalBytesWritten)
+        progress?(bytesWritten/totalBytesWritten)
     }
 }
 

@@ -31,6 +31,7 @@ final class RequestConfigurationTests: XCTestCase {
         }
     }
 
+
     func testCreatingURLConfigurationWithParameterTypeFailure() throws {
         let requestConfiguration: RequestConfiguration = .init(urlString: "http://www.example.com", method: .get, body: Data())
         do {

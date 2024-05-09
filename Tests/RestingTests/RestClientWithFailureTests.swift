@@ -48,7 +48,7 @@ final class RestClientWithFailureTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testAsyncAwaitWithFailure() async throws {
+    func testAsyncAwaitWithFailure() {
         MockedURLService.observer = { request -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "unsupported_url")!, statusCode: 403, httpVersion: nil, headerFields: nil)
             return (response, nil)
@@ -56,10 +56,20 @@ final class RestClientWithFailureTests: XCTestCase {
         let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
         let configuration = RequestConfiguration(urlString: "unsupported_url", method: .get)
 
-        do {
-            let url: URL = try await restClient.download(with: configuration)
-            XCTFail("Downloading should have been failed!")
-        } catch {
+        let expectation = XCTestExpectation(description: "Downloading file...")
+
+        restClient.download(with: configuration) { url, error in
+            guard url == nil else {
+                XCTFail("Download file url should be nil!")
+                return
+            }
+            guard error != nil else {
+                XCTFail("Download should have been failed!")
+                return
+            }
+            expectation.fulfill()
         }
+
+        wait(for: [expectation], timeout: 1.0)
     }
 }
