@@ -120,9 +120,9 @@ extension RestClient: URLSessionDownloadDelegate {
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         guard downloadTask == self.downloadTask else { return }
-        let bytesWritten = Double(bytesWritten)
         let totalBytesWritten = Double(totalBytesWritten)
-        progress?(bytesWritten/totalBytesWritten)
+        let totalBytesExpectedToWrite = Double(totalBytesExpectedToWrite)
+        progress?(totalBytesWritten/totalBytesExpectedToWrite)
     }
 }
 
