@@ -11,7 +11,7 @@ import Foundation
 ///
 /// This can be useful for handling HTTP responses where both the data and the metadata
 /// (like HTTP status codes) from the URL response are important.
-struct DataWithURLResponse {
+struct DataWithURLResponse: Sendable {
     /// The raw data received in the response.
     let data: Data
 

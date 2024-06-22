@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents errors related to the `RestClient` operations.
-public enum RestingError: LocalizedError {
+public enum RestingError: LocalizedError, Sendable {
     /// Represents a malformed URL error.
     case urlMalformed
 

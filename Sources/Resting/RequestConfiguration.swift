@@ -8,7 +8,7 @@
 import Foundation
 
 /// HTTP request methods.
-public enum HTTPMethod: String {
+public enum HTTPMethod: String, Sendable {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
@@ -16,7 +16,7 @@ public enum HTTPMethod: String {
 }
 
 /// Represents encoding types for the HTTP request.
-public enum HTTPEncoding {
+public enum HTTPEncoding: Sendable {
     case json, urlEncoded
 }
 
@@ -37,7 +37,7 @@ private enum ParameterType {
 }
 
 /// Represents the configuration for a RESTful HTTP request.
-public struct RequestConfiguration {
+public struct RequestConfiguration: Sendable {
     let urlString: String
     let method: HTTPMethod
     let headers: [String: String]?

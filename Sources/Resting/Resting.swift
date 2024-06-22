@@ -9,6 +9,8 @@ public struct RestClientConfiguration {
     /// The session configuration for network requests.
     let sessionConfiguration: URLSessionConfiguration
 
+    let fileManager: FileManager
+
     /// The JSON decoder for decoding responses.
     let jsonDecoder: JSONDecoder
 
@@ -17,8 +19,9 @@ public struct RestClientConfiguration {
     /// - Parameters:
     ///   - sessionConfiguration: The session configuration for network requests, defaults to `.default`.
     ///   - jsonDecoder: The JSON decoder for decoding responses, defaults to a new `JSONDecoder` instance.
-    public init(sessionConfiguration: URLSessionConfiguration = .default, jsonDecoder: JSONDecoder = .init()) {
+    public init(sessionConfiguration: URLSessionConfiguration = .default, fileManager: FileManager = .default, jsonDecoder: JSONDecoder = .init()) {
         self.sessionConfiguration = sessionConfiguration
+        self.fileManager = fileManager
         self.jsonDecoder = jsonDecoder
     }
 }
@@ -26,13 +29,16 @@ public struct RestClientConfiguration {
 /// Represents a client for making RESTful network requests.
 /// ///
 /// This client utilizes a `RestClientConfiguration` to configure its behavior, including the session configuration and JSON decoding.
-public class RestClient: NSObject {
+public final class RestClient: NSObject, @unchecked Sendable {
     private lazy var session: URLSession = URLSession(configuration: clientConfiguration.sessionConfiguration, delegate: self, delegateQueue: nil)
     private let clientConfiguration: RestClientConfiguration
 
     private var downloadCompletion: ((URL?, Error?) -> Void)?
     private var progress: ((Double) -> Void)?
     private var downloadTask: URLSessionDownloadTask?
+
+    // Serial queue for thread safety
+    private let downloadQueue = DispatchQueue(label: "com.ulassancak.restclient.download")
 
     /// Creates a new `RestClient` instance with the specified `RestClientConfiguration`.
     ///
@@ -72,57 +78,70 @@ extension RestClient {
     /// - Parameter configuration: The configuration for the network request.
     /// - Returns: A `URL` to the downloaded file.
     /// - Throws: Throws an error if the request fails or if the response can't be created.
-    public func download(with configuration: RequestConfiguration, completion: @escaping (URL?, Error?) -> Void, progress: ((Double) -> Void)? = nil) {
-        self.downloadCompletion = completion
-        self.progress = progress
-        do {
-            let urlRequest = try configuration.createURLRequest()
-            downloadTask = session.downloadTask(with: urlRequest)
-            downloadTask?.resume()
-        } catch {
-            completion(nil, error)
-            self.downloadCompletion = nil
-            self.progress = nil
+    public func download(with configuration: RequestConfiguration, completion: @escaping @Sendable (URL?, Error?) -> Void, progress: (@Sendable (Double) -> Void)? = nil) {
+        downloadQueue.async { [weak self] in
+            self?.downloadCompletion = completion
+            self?.progress = progress
+            do {
+                let urlRequest = try configuration.createURLRequest()
+                self?.downloadTask = self?.session.downloadTask(with: urlRequest)
+                self?.downloadTask?.resume()
+            } catch {
+                self?.downloadQueue.async {
+                    completion(nil, error)
+                    self?.downloadCompletion = nil
+                    self?.progress = nil
+                }
+            }
         }
     }
     
     public func cancel() {
-        downloadTask?.cancel()
+        downloadQueue.async { [weak self] in
+            self?.downloadTask?.cancel()
+        }
     }
 }
 
 extension RestClient: URLSessionDownloadDelegate {    
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
-        downloadCompletion?(nil, error)
-        downloadCompletion = nil
-        progress = nil
+        downloadQueue.async { [weak self] in
+            self?.downloadCompletion?(nil, error)
+            self?.downloadCompletion = nil
+            self?.progress = nil
+        }
     }
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        defer {
-            self.downloadCompletion = nil
-            self.progress = nil
-        }
-        do {
-            let documentsURL = try
-                FileManager.default.url(for: .documentDirectory,
-                                        in: .userDomainMask,
-                                        appropriateFor: nil,
-                                        create: false)
-            let savedURL = documentsURL.appendingPathComponent(
-                location.lastPathComponent)
-            try FileManager.default.moveItem(at: location, to: savedURL)
-            downloadCompletion?(savedURL, nil)
-        } catch {
-            downloadCompletion?(nil, error)
+        downloadQueue.async { [weak self] in
+            guard let self else { return }
+            defer {
+                downloadCompletion = nil
+                progress = nil
+            }
+            do {
+                let documentsURL = try
+                clientConfiguration.fileManager.url(for: .documentDirectory,
+                                            in: .userDomainMask,
+                                            appropriateFor: nil,
+                                            create: false)
+                let savedURL = documentsURL.appendingPathComponent(
+                    location.lastPathComponent)
+                try clientConfiguration.fileManager.moveItem(at: location, to: savedURL)
+                downloadCompletion?(savedURL, nil)
+            } catch {
+                downloadCompletion?(nil, error)
+            }
         }
     }
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard downloadTask == self.downloadTask else { return }
-        let totalBytesWritten = Double(totalBytesWritten)
-        let totalBytesExpectedToWrite = Double(totalBytesExpectedToWrite)
-        progress?(totalBytesWritten/totalBytesExpectedToWrite)
+        downloadQueue.async { [weak self] in
+            guard downloadTask == self?.downloadTask else { return }
+            let totalBytesWritten = Double(totalBytesWritten)
+            let totalBytesExpectedToWrite = Double(totalBytesExpectedToWrite)
+            self?.progress?(totalBytesWritten/totalBytesExpectedToWrite)
+        }
     }
 }
 

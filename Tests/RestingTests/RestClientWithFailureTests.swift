@@ -10,7 +10,6 @@ import XCTest
 import Combine
 
 final class RestClientWithFailureTests: XCTestCase {
-
     private let configuration = URLSessionConfiguration.default
     private var cancellables = Set<AnyCancellable>()
 
