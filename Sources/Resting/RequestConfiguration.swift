@@ -31,8 +31,8 @@ private enum ContentType: String {
     case json = "application/json"
 }
 
-private enum ParameterType {
-    case object([String: Any])
+private enum ParameterType: Sendable {
+    case object([String: any Sendable])
     case data(Data)
 }
 
@@ -53,7 +53,7 @@ public struct RequestConfiguration: Sendable {
     ///   - parameters: The parameters dictionary to be included in the request. Default is `nil`.
     ///   - headers: Additional HTTP headers to include in the request. Default is `nil`.
     ///   - encofing: The encoding for the request. Default is `.urlEncoded`.
-    public init(urlString: String, method: HTTPMethod = .get, parameters: [String: Any]?, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
+    public init(urlString: String, method: HTTPMethod = .get, parameters: [String: any Sendable]?, headers: [String: String]? = nil, encoding: HTTPEncoding = .urlEncoded) {
         self.urlString = urlString
         self.method = method
         if let parameters {

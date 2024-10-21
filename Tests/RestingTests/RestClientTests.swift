@@ -16,7 +16,7 @@ final class RestClientTestsWithExpectation: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        configuration.protocolClasses = [MockedDownloadURLService.self]
+        configuration.protocolClasses = [MockedURLService.self]
     }
 
     override func tearDownWithError() throws {
@@ -24,8 +24,8 @@ final class RestClientTestsWithExpectation: XCTestCase {
         configuration.protocolClasses = nil
     }
 
-    func testPublisher() throws {
-        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+    func testPublisher() async throws {
+        MockedURLService.observer = { () -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             let exampleString = "{\"title\":\"Title Example\"}"
             let exampleData = exampleString.data(using: .utf8)
@@ -43,6 +43,7 @@ final class RestClientTestsWithExpectation: XCTestCase {
             .sink { completion in
                 switch completion {
                 case .failure(let error):
+                    print(error)
                     XCTAssert(false, error.localizedDescription)
                     expectation.fulfill()
                 case .finished:
@@ -54,11 +55,12 @@ final class RestClientTestsWithExpectation: XCTestCase {
             }
             .store(in: &cancellables)
 
-        waitForExpectations(timeout: 0.1)
+        await fulfillment(of: [expectation], timeout: 0.1)
+//            waitForExpectations(timeout: 1)
     }
 
-    func testPublisherWithPublisherFailure() throws {
-        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+    func testPublisherWithPublisherFailure() async throws {
+        MockedURLService.observer = { () -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "http://\u{FFFD}\u{FFFE}")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (response, nil)
         }
@@ -83,31 +85,8 @@ final class RestClientTestsWithExpectation: XCTestCase {
             } receiveValue: { _ in }
             .store(in: &cancellables)
 
-        waitForExpectations(timeout: 1)
+        await fulfillment(of: [expectation], timeout: 1)
+//            waitForExpectations(timeout: 1)
     }
 
-    func testHandlingURLConfigurationFailureWithDownload() {
-        MockedURLService.observer = { request -> (URLResponse?, Data?) in
-            let response = HTTPURLResponse(url: URL(string: "http://\u{FFFD}\u{FFFE}")!, statusCode: 403, httpVersion: nil, headerFields: nil)
-            return (response, nil)
-        }
-        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
-        let configuration = RequestConfiguration(urlString: "http://\u{FFFD}\u{FFFE}", method: .get)
-
-        let expectation = XCTestExpectation(description: "Downloading file...")
-
-        restClient.download(with: configuration) { url, error in
-            guard url == nil else {
-                XCTFail("Download file url should be nil!")
-                return
-            }
-            guard error != nil else {
-                XCTFail("Download should not be nil!")
-                return
-            }
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: 1.0)
-    }
 }

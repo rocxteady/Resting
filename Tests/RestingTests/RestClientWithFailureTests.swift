@@ -9,6 +9,7 @@ import XCTest
 @testable import Resting
 import Combine
 
+@MainActor
 final class RestClientWithFailureTests: XCTestCase {
     private let configuration = URLSessionConfiguration.default
     private var cancellables = Set<AnyCancellable>()
@@ -48,7 +49,7 @@ final class RestClientWithFailureTests: XCTestCase {
     }
 
     func testAsyncAwaitWithFailure() {
-        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+        MockedURLService.observer = { ()  -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "unsupported_url")!, statusCode: 403, httpVersion: nil, headerFields: nil)
             return (response, nil)
         }

@@ -113,7 +113,7 @@ final class RequestConfigurationTests {
     }
 
     @Test func testCreatingURLRequestWithPostWithJSONEncoding() throws {
-        let parameters: [String: Any] = ["key": "value", "some_key": "ş"]
+        let parameters: [String: any Sendable] = ["key": "value", "some_key": "ş"]
         let queryArray = parameters.map {
             "\($0.key)=\($0.value)"
         }.sorted()

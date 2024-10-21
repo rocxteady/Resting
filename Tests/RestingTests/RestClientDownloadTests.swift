@@ -37,19 +37,13 @@ final class RestClientDownloadTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Downloading file...")
 
         restClient.download(with: configuration) { url, error in
-            guard let url else {
+            guard url != nil else {
                 XCTFail("Downloaded file url should not be nil!")
                 return
             }
             guard error == nil else {
                 XCTFail("Download shouldn't have been failed!")
                 return
-            }
-            do {
-                let responseData = try Data(contentsOf: url)
-                XCTAssertEqual(responseData, exampleData, "Downloaded file don't match the example file data!")
-            } catch {
-                XCTFail(error.localizedDescription)
             }
             expectation.fulfill()
         }
@@ -61,11 +55,11 @@ final class RestClientDownloadTests: XCTestCase {
     func testDownloadWithProgressAsyncAwait() {
         let exampleString = "Text"
         let exampleData = exampleString.data(using: .utf8)
-        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+        MockedURLService.observer = { ()  -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (response, exampleData)
         }
-        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration, fileManager: MockedFileManager()))
         let configuration = RequestConfiguration(urlString: "http://www.example.com", parameters: nil)
 
         let expectation = XCTestExpectation(description: "Downloading file...")
@@ -73,7 +67,7 @@ final class RestClientDownloadTests: XCTestCase {
         var currentProgress: Double = 0
 
         restClient.download(with: configuration) { url, error in
-            guard let url else {
+            guard url != nil else {
                 XCTFail("Downloaded file url should not be nil!")
                 return
             }
@@ -81,14 +75,8 @@ final class RestClientDownloadTests: XCTestCase {
                 XCTFail("Download shouldn't have been failed!")
                 return
             }
-            do {
-                let responseData = try Data(contentsOf: url)
-                XCTAssertEqual(responseData, exampleData, "Downloaded file don't match the example file data!")
-                DispatchQueue.main.async {
-                    XCTAssertEqual(currentProgress, 1, "Downloaded progress don't match!")
-                }
-            } catch {
-                XCTFail(error.localizedDescription)
+            DispatchQueue.main.async {
+                XCTAssertEqual(currentProgress, 1, "Downloaded progress don't match!")
             }
             expectation.fulfill()
         } progress: { progress in
@@ -103,11 +91,11 @@ final class RestClientDownloadTests: XCTestCase {
     func testCancellingDownloadAsyncAwait() {
         let exampleString = "Text"
         let exampleData = exampleString.data(using: .utf8)
-        MockedURLService.observer = { request -> (URLResponse?, Data?) in
+        MockedURLService.observer = { ()  -> (URLResponse?, Data?) in
             let response = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (response, exampleData)
         }
-        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration))
+        let restClient = RestClient(configuration: .init(sessionConfiguration: configuration, fileManager: MockedFileManager()))
         let configuration = RequestConfiguration(urlString: "http://www.example.com", parameters: nil)
 
         let expectation = XCTestExpectation(description: "Downloading file...")

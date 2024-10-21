@@ -8,7 +8,7 @@
 import Foundation
 
 class MockedURLService: URLProtocol {
-    static var observer: ((URLRequest) throws -> (URLResponse?, Data?))?
+    nonisolated(unsafe) static var observer: (() throws -> (URLResponse?, Data?))?
 
     override class func canInit(with request: URLRequest) -> Bool {
         true
@@ -24,7 +24,7 @@ class MockedURLService: URLProtocol {
 
     override func startLoading() {
         do {
-            guard let (response, data) = try Self.observer?(request) else {
+            guard let (response, data) = try MockedURLService.observer?() else {
                 return
             }
 
@@ -45,7 +45,7 @@ class MockedURLService: URLProtocol {
 }
 
 class MockedURLServiceWithFailure: URLProtocol {
-    static var observer: ((URLRequest) throws -> (URLResponse?, Data?))?
+    nonisolated(unsafe) static var observer: ((URLRequest) throws -> (URLResponse?, Data?))?
 
     override class func canInit(with request: URLRequest) -> Bool {
         true
@@ -67,7 +67,7 @@ class MockedURLServiceWithFailure: URLProtocol {
 }
 
 class MockedDownloadURLService: URLProtocol {
-    static var observer: ((URLRequest) throws -> (URLResponse?, Data?))?
+    nonisolated(unsafe) static var observer: ((URLRequest) throws -> (URLResponse?, Data?))?
 
     override class func canInit(with request: URLRequest) -> Bool {
         true
@@ -110,7 +110,10 @@ class MockedDownloadURLService: URLProtocol {
                 )
             }
             
-            client?.urlProtocol(self, didWriteData: 4, totalBytesWritten: 4, totalBytesExpectedToWrite: 4)
+            if let task = task as? URLSessionDownloadTask,
+               let delegate = task.delegate as? URLSessionDownloadDelegate {
+                delegate.urlSession?(URLSession.shared, downloadTask: task, didWriteData: 4, totalBytesWritten: 4, totalBytesExpectedToWrite: 4)
+            }
 
             if let response = modifiedResponse {
                 client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)

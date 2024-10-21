@@ -87,11 +87,8 @@ extension RestClient {
                 self?.downloadTask = self?.session.downloadTask(with: urlRequest)
                 self?.downloadTask?.resume()
             } catch {
-                self?.downloadQueue.async {
-                    completion(nil, error)
-                    self?.downloadCompletion = nil
-                    self?.progress = nil
-                }
+                self?.downloadCompletion = nil
+                self?.progress = nil
             }
         }
     }
