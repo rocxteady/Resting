@@ -17,9 +17,9 @@
 
 **Purpose**: Upgrade the package baseline and create the target source/test layout before shared implementation work begins.
 
-- [ ] T001 Upgrade `Package.swift` to `swift-tools-version: 6.2` and review Apple platform declarations, including `visionOS`, in `Package.swift`
-- [ ] T002 Create the domain-oriented source scaffolding in `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Client/RestClientConfiguration.swift`, `Sources/Resting/Client/RestClient+Combine.swift`, `Sources/Resting/Requests/HTTPMethod.swift`, `Sources/Resting/Requests/RequestDefinition.swift`, `Sources/Resting/Requests/RequestBody.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, `Sources/Resting/Responses/ResponseValidator.swift`, `Sources/Resting/Transfers/TransferHandle.swift`, `Sources/Resting/Support/RestingError.swift`, `Sources/Resting/Support/URLSessionExecutor.swift`, and `Sources/Resting/Support/FoundationNetworkingSupport.swift`
-- [ ] T003 [P] Create the reorganized test scaffolding in `Tests/RestingTests/Client/RestClientAsyncTests.swift`, `Tests/RestingTests/Client/RestClientCombineTests.swift`, `Tests/RestingTests/Requests/RequestDefinitionTests.swift`, `Tests/RestingTests/Transfers/TransferHandleTests.swift`, `Tests/RestingTests/Errors/RestingErrorMappingTests.swift`, `Tests/RestingTests/Localization/LocalizationResourceTests.swift`, `Tests/RestingTests/Mocks/MockURLProtocol.swift`, and `Tests/RestingTests/Mocks/DownloadFixture.swift`
+- [x] T001 Upgrade `Package.swift` to `swift-tools-version: 6.2` and review Apple platform declarations, including `visionOS`, in `Package.swift`
+- [x] T002 Create the domain-oriented source scaffolding in `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Client/RestClientConfiguration.swift`, `Sources/Resting/Client/RestClient+Combine.swift`, `Sources/Resting/Requests/HTTPMethod.swift`, `Sources/Resting/Requests/RequestDefinition.swift`, `Sources/Resting/Requests/RequestBody.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, `Sources/Resting/Responses/ResponseValidator.swift`, `Sources/Resting/Transfers/TransferHandle.swift`, `Sources/Resting/Support/RestingError.swift`, `Sources/Resting/Support/URLSessionExecutor.swift`, and `Sources/Resting/Support/FoundationNetworkingSupport.swift`
+- [x] T003 [P] Create the reorganized test scaffolding in `Tests/RestingTests/Client/RestClientAsyncTests.swift`, `Tests/RestingTests/Client/RestClientCombineTests.swift`, `Tests/RestingTests/Requests/RequestDefinitionTests.swift`, `Tests/RestingTests/Transfers/TransferHandleTests.swift`, `Tests/RestingTests/Errors/RestingErrorMappingTests.swift`, `Tests/RestingTests/Localization/LocalizationResourceTests.swift`, `Tests/RestingTests/Mocks/MockURLProtocol.swift`, and `Tests/RestingTests/Mocks/DownloadFixture.swift`
 
 ---
 
@@ -29,11 +29,11 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete.
 
-- [ ] T004 Implement shared transport execution and HTTP response validation in `Sources/Resting/Support/URLSessionExecutor.swift` and `Sources/Resting/Responses/ResponseValidator.swift`
-- [ ] T005 [P] Define the canonical typed failure contract in `Sources/Resting/Support/RestingError.swift` and align localized error keys in `Sources/Resting/Resources/en.lproj/Localizable.strings` and `Sources/Resting/Resources/tr.lproj/Localizable.strings`
-- [ ] T006 [P] Add request-building support primitives in `Sources/Resting/Requests/HTTPMethod.swift`, `Sources/Resting/Requests/RequestBody.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, and `Sources/Resting/Support/FoundationNetworkingSupport.swift`
-- [ ] T007 [P] Build deterministic request/download mocks in `Tests/RestingTests/Mocks/MockURLProtocol.swift` and `Tests/RestingTests/Mocks/DownloadFixture.swift`
-- [ ] T008 Establish the legacy-to-modern migration baseline by auditing `Sources/Resting/Resting.swift`, `Sources/Resting/RequestConfiguration.swift`, `Sources/Resting/RestingError.swift`, `Sources/Resting/Extensions/URLSession+Helper.swift`, `Sources/Resting/Extensions/URLComponents+Helper.swift`, and `Sources/Resting/DataWithURLResponse.swift`
+- [x] T004 Implement shared transport execution and HTTP response validation in `Sources/Resting/Support/URLSessionExecutor.swift` and `Sources/Resting/Responses/ResponseValidator.swift`
+- [x] T005 [P] Define the canonical typed failure contract in `Sources/Resting/Support/RestingError.swift` and align localized error keys in `Sources/Resting/Resources/en.lproj/Localizable.strings` and `Sources/Resting/Resources/tr.lproj/Localizable.strings`
+- [x] T006 [P] Add request-building support primitives in `Sources/Resting/Requests/HTTPMethod.swift`, `Sources/Resting/Requests/RequestBody.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, and `Sources/Resting/Support/FoundationNetworkingSupport.swift`
+- [x] T007 [P] Build deterministic request/download mocks in `Tests/RestingTests/Mocks/MockURLProtocol.swift` and `Tests/RestingTests/Mocks/DownloadFixture.swift`
+- [x] T008 Establish the legacy-to-modern migration baseline by auditing `Sources/Resting/Resting.swift`, `Sources/Resting/RequestConfiguration.swift`, `Sources/Resting/RestingError.swift`, `Sources/Resting/Extensions/URLSession+Helper.swift`, `Sources/Resting/Extensions/URLComponents+Helper.swift`, and `Sources/Resting/DataWithURLResponse.swift`
 
 **Checkpoint**: Shared contracts, mocks, localization keys, and migration boundaries are in place for story work.
 
@@ -47,15 +47,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [P] [US1] Add request-construction coverage for query, form, JSON, raw-body, and header-merging flows in `Tests/RestingTests/Requests/RequestDefinitionTests.swift`
-- [ ] T010 [P] [US1] Add async raw-data and decoded-response coverage for the modern client surface in `Tests/RestingTests/Client/RestClientAsyncTests.swift`
+- [x] T009 [P] [US1] Add request-construction coverage for query, form, JSON, raw-body, and header-merging flows in `Tests/RestingTests/Requests/RequestDefinitionTests.swift`
+- [x] T010 [P] [US1] Add async raw-data and decoded-response coverage for the modern client surface in `Tests/RestingTests/Client/RestClientAsyncTests.swift`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Implement client configuration defaults and async-first initialization in `Sources/Resting/Client/RestClientConfiguration.swift` and `Sources/Resting/Client/RestClient.swift`
-- [ ] T012 [P] [US1] Implement specialized typed request entry points in `Sources/Resting/Requests/RequestDefinition.swift` and `Sources/Resting/Requests/RequestBody.swift`
-- [ ] T013 [US1] Wire async raw and decoded execution through `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, and `Sources/Resting/Responses/ResponseValidator.swift`
-- [ ] T014 [US1] Update the primary async usage guidance and symbol docs in `README.md`, `specs/001-modernize-public-api/quickstart.md`, `Sources/Resting/Client/RestClient.swift`, and `Sources/Resting/Requests/RequestDefinition.swift`
+- [x] T011 [P] [US1] Implement client configuration defaults and async-first initialization in `Sources/Resting/Client/RestClientConfiguration.swift` and `Sources/Resting/Client/RestClient.swift`
+- [x] T012 [P] [US1] Implement specialized typed request entry points in `Sources/Resting/Requests/RequestDefinition.swift` and `Sources/Resting/Requests/RequestBody.swift`
+- [x] T013 [US1] Wire async raw and decoded execution through `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, and `Sources/Resting/Responses/ResponseValidator.swift`
+- [x] T014 [US1] Update the primary async usage guidance and symbol docs in `README.md`, `specs/001-modernize-public-api/quickstart.md`, `Sources/Resting/Client/RestClient.swift`, and `Sources/Resting/Requests/RequestDefinition.swift`
 
 **Checkpoint**: User Story 1 is a usable MVP with a documented async-first client experience.
 
@@ -69,15 +69,15 @@
 
 ### Tests for User Story 2
 
-- [ ] T015 [P] [US2] Add typed error-mapping and cancellation coverage in `Tests/RestingTests/Errors/RestingErrorMappingTests.swift`
-- [ ] T016 [P] [US2] Add Combine compatibility and overlapping transfer coverage in `Tests/RestingTests/Client/RestClientCombineTests.swift` and `Tests/RestingTests/Transfers/TransferHandleTests.swift`
+- [x] T015 [P] [US2] Add typed error-mapping and cancellation coverage in `Tests/RestingTests/Errors/RestingErrorMappingTests.swift`
+- [x] T016 [P] [US2] Add Combine compatibility and overlapping transfer coverage in `Tests/RestingTests/Client/RestClientCombineTests.swift` and `Tests/RestingTests/Transfers/TransferHandleTests.swift`
 
 ### Implementation for User Story 2
 
-- [ ] T017 [P] [US2] Implement canonical failure mapping for transport, invalid response, status code, decoding, cancellation, and file handling in `Sources/Resting/Support/RestingError.swift`, `Sources/Resting/Responses/ResponseValidator.swift`, and `Sources/Resting/Client/RestClient.swift`
-- [ ] T018 [P] [US2] Implement Combine compatibility APIs on the shared execution pipeline in `Sources/Resting/Client/RestClient+Combine.swift` and `Sources/Resting/Client/RestClient.swift`
-- [ ] T019 [P] [US2] Implement per-operation download ownership, progress observation, and cancellation in `Sources/Resting/Transfers/TransferHandle.swift` and `Sources/Resting/Client/RestClient.swift`
-- [ ] T020 [US2] Document failure semantics, Combine usage, transfer lifecycle behavior, and localized messaging updates in `README.md`, `specs/001-modernize-public-api/quickstart.md`, `Sources/Resting/Transfers/TransferHandle.swift`, `Sources/Resting/Resources/en.lproj/Localizable.strings`, and `Sources/Resting/Resources/tr.lproj/Localizable.strings`
+- [x] T017 [P] [US2] Implement canonical failure mapping for transport, invalid response, status code, decoding, cancellation, and file handling in `Sources/Resting/Support/RestingError.swift`, `Sources/Resting/Responses/ResponseValidator.swift`, and `Sources/Resting/Client/RestClient.swift`
+- [x] T018 [P] [US2] Implement Combine compatibility APIs on the shared execution pipeline in `Sources/Resting/Client/RestClient+Combine.swift` and `Sources/Resting/Client/RestClient.swift`
+- [x] T019 [P] [US2] Implement per-operation download ownership, progress observation, and cancellation in `Sources/Resting/Transfers/TransferHandle.swift` and `Sources/Resting/Client/RestClient.swift`
+- [x] T020 [US2] Document failure semantics, Combine usage, transfer lifecycle behavior, and localized messaging updates in `README.md`, `specs/001-modernize-public-api/quickstart.md`, `Sources/Resting/Transfers/TransferHandle.swift`, `Sources/Resting/Resources/en.lproj/Localizable.strings`, and `Sources/Resting/Resources/tr.lproj/Localizable.strings`
 
 **Checkpoint**: User Stories 1 and 2 now cover the primary public request, response, download, cancellation, and failure flows.
 
@@ -91,14 +91,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T021 [P] [US3] Split legacy behavior coverage into domain-aligned suites in `Tests/RestingTests/Client/RestClientAsyncTests.swift`, `Tests/RestingTests/Client/RestClientCombineTests.swift`, `Tests/RestingTests/Requests/RequestDefinitionTests.swift`, and `Tests/RestingTests/Transfers/TransferHandleTests.swift`
-- [ ] T022 [P] [US3] Add localization regression coverage for every public error case in `Tests/RestingTests/Localization/LocalizationResourceTests.swift`
+- [x] T021 [P] [US3] Split legacy behavior coverage into domain-aligned suites in `Tests/RestingTests/Client/RestClientAsyncTests.swift`, `Tests/RestingTests/Client/RestClientCombineTests.swift`, `Tests/RestingTests/Requests/RequestDefinitionTests.swift`, and `Tests/RestingTests/Transfers/TransferHandleTests.swift`
+- [x] T022 [P] [US3] Add localization regression coverage for every public error case in `Tests/RestingTests/Localization/LocalizationResourceTests.swift`
 
 ### Implementation for User Story 3
 
-- [ ] T023 [P] [US3] Finalize the domain-oriented source layout in `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Client/RestClientConfiguration.swift`, `Sources/Resting/Client/RestClient+Combine.swift`, `Sources/Resting/Requests/HTTPMethod.swift`, `Sources/Resting/Requests/RequestDefinition.swift`, `Sources/Resting/Requests/RequestBody.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, `Sources/Resting/Responses/ResponseValidator.swift`, `Sources/Resting/Transfers/TransferHandle.swift`, and `Sources/Resting/Support/RestingError.swift`
-- [ ] T024 [US3] Remove obsolete legacy files and test suites in `Sources/Resting/Resting.swift`, `Sources/Resting/RequestConfiguration.swift`, `Sources/Resting/RestingError.swift`, `Sources/Resting/Extensions/URLSession+Helper.swift`, `Sources/Resting/Extensions/URLComponents+Helper.swift`, `Sources/Resting/DataWithURLResponse.swift`, `Tests/RestingTests/RestClientTests.swift`, `Tests/RestingTests/RestClientWithFailureTests.swift`, `Tests/RestingTests/RequestConfigurationTests.swift`, and `Tests/RestingTests/LocalizationTests.swift`
-- [ ] T025 [US3] Write breaking-change migration guidance and maintainer release notes in `README.md` and `specs/001-modernize-public-api/contracts/public-api.md`
+- [x] T023 [P] [US3] Finalize the domain-oriented source layout in `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Client/RestClientConfiguration.swift`, `Sources/Resting/Client/RestClient+Combine.swift`, `Sources/Resting/Requests/HTTPMethod.swift`, `Sources/Resting/Requests/RequestDefinition.swift`, `Sources/Resting/Requests/RequestBody.swift`, `Sources/Resting/Responses/ResponsePayload.swift`, `Sources/Resting/Responses/ResponseValidator.swift`, `Sources/Resting/Transfers/TransferHandle.swift`, and `Sources/Resting/Support/RestingError.swift`
+- [x] T024 [US3] Remove obsolete legacy files and test suites in `Sources/Resting/Resting.swift`, `Sources/Resting/RequestConfiguration.swift`, `Sources/Resting/RestingError.swift`, `Sources/Resting/Extensions/URLSession+Helper.swift`, `Sources/Resting/Extensions/URLComponents+Helper.swift`, `Sources/Resting/DataWithURLResponse.swift`, `Tests/RestingTests/RestClientTests.swift`, `Tests/RestingTests/RestClientWithFailureTests.swift`, `Tests/RestingTests/RequestConfigurationTests.swift`, and `Tests/RestingTests/LocalizationTests.swift`
+- [x] T025 [US3] Write breaking-change migration guidance and maintainer release notes in `README.md` and `specs/001-modernize-public-api/contracts/public-api.md`
 
 **Checkpoint**: The package structure, naming, tests, and migration notes reflect the modernized public domain cleanly.
 
@@ -108,11 +108,11 @@
 
 **Purpose**: Finish documentation, platform review, localization parity, and end-to-end validation across the completed stories.
 
-- [ ] T026 [P] Refresh installation, upgrade, and migration sections in `README.md` and `specs/001-modernize-public-api/contracts/public-api.md`
-- [ ] T027 [P] Verify platform availability and `FoundationNetworking` coverage in `Package.swift`, `Sources/Resting/Client/RestClient.swift`, and `Sources/Resting/Support/FoundationNetworkingSupport.swift`
-- [ ] T028 [P] Polish public documentation comments and naming consistency in `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Requests/RequestDefinition.swift`, `Sources/Resting/Transfers/TransferHandle.swift`, and `Sources/Resting/Support/RestingError.swift`
-- [ ] T029 [P] Audit English and Turkish resource parity in `Sources/Resting/Resources/en.lproj/Localizable.strings` and `Sources/Resting/Resources/tr.lproj/Localizable.strings`
-- [ ] T030 Run the end-to-end quickstart validation and apply any last documentation fixes in `specs/001-modernize-public-api/quickstart.md` and `README.md`
+- [x] T026 [P] Refresh installation, upgrade, and migration sections in `README.md` and `specs/001-modernize-public-api/contracts/public-api.md`
+- [x] T027 [P] Verify platform availability and `FoundationNetworking` coverage in `Package.swift`, `Sources/Resting/Client/RestClient.swift`, and `Sources/Resting/Support/FoundationNetworkingSupport.swift`
+- [x] T028 [P] Polish public documentation comments and naming consistency in `Sources/Resting/Client/RestClient.swift`, `Sources/Resting/Requests/RequestDefinition.swift`, `Sources/Resting/Transfers/TransferHandle.swift`, and `Sources/Resting/Support/RestingError.swift`
+- [x] T029 [P] Audit English and Turkish resource parity in `Sources/Resting/Resources/en.lproj/Localizable.strings` and `Sources/Resting/Resources/tr.lproj/Localizable.strings`
+- [x] T030 Run the end-to-end quickstart validation and apply any last documentation fixes in `specs/001-modernize-public-api/quickstart.md` and `README.md`
 
 ---
 

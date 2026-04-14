@@ -1,0 +1,7 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+[projects."/Users/ulas.sancak/Desktop/Projects/Personal/Resting"]
+trust_level = "trusted"
+
+[features]
+prevent_idle_sleep = true

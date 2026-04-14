@@ -22,7 +22,9 @@ import Resting
 
 let configuration = RestClientConfiguration(
     sessionConfiguration: .default,
-    decoder: JSONDecoder()
+    decoder: JSONDecoder(),
+    encoder: JSONEncoder(),
+    defaultHeaders: ["Accept": "application/json"]
 )
 
 let client = RestClient(configuration: configuration)
@@ -45,7 +47,18 @@ let request = RequestDefinition.json(
 let article: Article = try await client.execute(request, as: Article.self)
 ```
 
-### 4. Execute with Combine compatibility APIs
+### 4. Execute a raw request when you need HTTP metadata
+
+```swift
+let payload = try await client.execute(
+    .query(url: URL(string: "https://api.example.com/articles?page=1")!)
+)
+
+print(payload.statusCode)
+print(payload.value)
+```
+
+### 5. Execute with Combine compatibility APIs
 
 ```swift
 let cancellable = client
@@ -60,7 +73,7 @@ let cancellable = client
     )
 ```
 
-### 5. Start a download with per-operation ownership
+### 6. Start a download with per-operation ownership
 
 ```swift
 let request = RequestDefinition.download(
@@ -74,6 +87,12 @@ handle.observeProgress { progress in
 }
 
 let fileURL = try await handle.value
+```
+
+### 7. Cancel a single transfer without affecting other work
+
+```swift
+handle.cancel()
 ```
 
 ## Maintainer Verification Checklist

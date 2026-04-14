@@ -1,12 +1,7 @@
-/* 
-  Localizable.strings
-  
-
-  Created by Ulaş Sancak on 1.10.2023.
-  
-*/
-
-"restingerror.urlMalformed" = "URL malformed.";
-"restingerror.statusCode" = "HTTP returned unxpected %i code.";
-"restingerror.wrongParameterType" = "Wrong parameter type. You can't use Data type as parameter with a 'GET' request. Use Dictionary as type instead.";
-"restingerror.unknown" = "Unknown error.";
+"restingerror.invalidRequest" = "Invalid request: %@";
+"restingerror.transport" = "Transport error: %@";
+"restingerror.invalidResponse" = "The server response was not a valid HTTP response.";
+"restingerror.statusCode" = "HTTP returned an unexpected %i status code.";
+"restingerror.decoding" = "The response could not be decoded: %@";
+"restingerror.cancelled" = "The operation was cancelled.";
+"restingerror.fileSystem" = "The downloaded file could not be persisted: %@";

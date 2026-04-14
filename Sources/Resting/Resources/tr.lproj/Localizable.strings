@@ -1,12 +1,7 @@
-/* 
-  Localizable.strings
-  
-
-  Created by Ulaş Sancak on 1.10.2023.
-  
-*/
-
-"restingerror.urlMalformed" = "URL hatalı.";
-"restingerror.statusCode" = "HTTP bekleyen bir %i kodu döndü.";
-"restingerror.wrongParameterType" = "Yanlış parametre tipi. Parametre olarak Data veri tipini kullanamazsınız, onun yerine veri tipi olarak Dictionary kullanın.";
-"restingerror.unknown" = "Bilinmeyen hata.";
+"restingerror.invalidRequest" = "Geçersiz istek: %@";
+"restingerror.transport" = "Aktarım hatası: %@";
+"restingerror.invalidResponse" = "Sunucu yanıtı geçerli bir HTTP yanıtı değildi.";
+"restingerror.statusCode" = "HTTP beklenmeyen %i durum kodu döndürdü.";
+"restingerror.decoding" = "Yanıt çözümlenemedi: %@";
+"restingerror.cancelled" = "İşlem iptal edildi.";
+"restingerror.fileSystem" = "İndirilen dosya kaydedilemedi: %@";

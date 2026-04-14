@@ -1,118 +1,185 @@
 # Resting
 [![Swift](https://github.com/rocxteady/Resting/actions/workflows/swift.yml/badge.svg)](https://github.com/rocxteady/Resting/actions/workflows/swift.yml)
 
-A Swift package offering a simplified interface for HTTP REST requests using both Combine and async/await patterns.
+`Resting` is an async/await-first Swift package for common REST client work.
+It provides typed request definitions, validated HTTP responses, a shared typed
+error model, secondary Combine compatibility APIs, and per-operation download
+handles with isolated progress and cancellation.
 
-## Features
+## Requirements
 
-- Simplified HTTP methods (`GET`, `POST`, `PUT`, `DELETE`)
-- Easily customizable request configurations
-- Seamless error handling with specific `RestingError` cases
-- Asynchronous request handling using Swift's new `async/await` feature
-- Reactive request handling with Combine framework publishers
-- Send parameters as either `Dictionary` or `Data`
-- Handle responses with both `Data`and `Decodable`
+- Swift 6.2
+- Apple platforms supported by `Package.swift`: iOS 15+, macOS 12+, watchOS 8+, tvOS 15+, visionOS 1+
 
 ## Installation
 
-You can add the package to the dependencies value of your Package.swift
-```
+Add `Resting` to your Swift Package Manager dependencies:
+
+```swift
 dependencies: [
-    .package(url: "https://github.com/rocxteady/Resting.git", .upToNextMajor(from: "0.0.6"))
+    .package(url: "https://github.com/rocxteady/Resting.git", branch: "main")
 ]
 ```
 
-## Usage
+## Primary Async Flow
 
-### 1. Import the package
+Import the package and configure a client:
 
-```
+```swift
 import Resting
+
+let configuration = RestClientConfiguration(
+    sessionConfiguration: .default,
+    decoder: JSONDecoder(),
+    encoder: JSONEncoder(),
+    defaultHeaders: ["Accept": "application/json"]
+)
+
+let client = RestClient(configuration: configuration)
 ```
 
-### 2. Create an instance of the `RestClient`
+Build a request with the request style that matches the operation:
 
-```
-let clientConfiguration = RestClientConfiguration(sessionConfiguration: .default, jsonDecoder: .init())
-let restClient = RestClient(configuration: clientConfiguration)
-```
-
-### 3. Configure your request
-
-```
-let requestConfig = RequestConfiguration(
-    urlString: "https://api.example.com/data",
-    method: .get
+```swift
+let request = RequestDefinition.json(
+    url: URL(string: "https://api.example.com/articles")!,
+    method: .post,
+    body: CreateArticleRequest(title: "Modern API"),
+    headers: ["Authorization": "Bearer token"]
 )
 ```
 
-### 4. Make the HTTP call
+Execute raw or decoded responses:
 
-#### Using async/await:
+```swift
+let rawPayload = try await client.execute(request)
+let rawData = rawPayload.value
 
-```
-// Decodable as response
-do {
-    let data: YourDecodableModel = try await restClient.fetch(with: requestConfig)
-    // Handle the data
-} catch {
-    // Handle the error
-}
-
-// Data as response
-do {
-    let data = try await restClient.fetch(with: requestConfig)
-    // Handle the data
-} catch {
-    // Handle the error
-}
-
+let article: Article = try await client.execute(
+    .query(url: URL(string: "https://api.example.com/articles/1")!),
+    as: Article.self
+)
 ```
 
-#### Using Combine:
+## Request Styles
 
+Use the specialized constructors instead of a single overloaded request type:
+
+```swift
+let search = RequestDefinition.query(
+    url: URL(string: "https://api.example.com/articles")!,
+    queryItems: [URLQueryItem(name: "page", value: "1")]
+)
+
+let form = RequestDefinition.form(
+    url: URL(string: "https://api.example.com/login")!,
+    fields: ["email": "hello@example.com", "password": "secret"]
+)
+
+let json = RequestDefinition.json(
+    url: URL(string: "https://api.example.com/articles")!,
+    body: CreateArticleRequest(title: "Modern API")
+)
+
+let raw = RequestDefinition.raw(
+    url: URL(string: "https://api.example.com/upload")!,
+    body: Data("payload".utf8),
+    contentType: "application/octet-stream"
+)
 ```
-// Decodable as response
-let cancellable :AnyPublisher<YourDecodableModel, Error> = restClient.publisher(with: requestConfig)
-cancellable.sink { completion in
-    // Handle completion or error
-} receiveValue: { (data: YourDecodableModel) in
-    // Handle the data
+
+## Combine Compatibility
+
+Combine remains available as a secondary surface when an app still needs
+publisher-based integration:
+
+```swift
+import Combine
+
+let cancellable = client
+    .publisher(for: request, as: Article.self)
+    .sink(
+        receiveCompletion: { completion in
+            if case .failure(let error) = completion {
+                print(error.localizedDescription)
+            }
+        },
+        receiveValue: { article in
+            print(article)
+        }
+    )
+```
+
+## Downloads, Progress, And Cancellation
+
+Each download returns its own `TransferHandle`, so overlapping transfers do not
+share hidden mutable client state:
+
+```swift
+let handle = client.download(
+    .download(url: URL(string: "https://example.com/archive.zip")!)
+)
+
+handle.observeProgress { progress in
+    print(progress.fractionCompleted)
 }
 
-// Data as response
-restClient.publisher(with: requestConfig)
-.sink { completion in
-    // Handle completion or error
-} receiveValue: { data in
-    // Handle the data
-}
+let fileURL = try await handle.value
+```
+
+Cancellation is per handle:
+
+```swift
+handle.cancel()
 ```
 
 ## Error Handling
 
-The package provides a dedicated `RestingError` enum to handle errors gracefully. It includes cases like `.urlMalformed`, `.statusCode`, `.wrongParameterType` and `.unknown`. Make sure to incorporate these in your error handling logic.
+All public execution paths use the same `RestingError` model:
 
-## Localizations
+- `invalidRequest(reason:)`
+- `transport(URLError)`
+- `invalidResponse`
+- `statusCode(Int, Data?)`
+- `decoding(underlying:data:)`
+- `cancelled`
+- `fileSystem(underlying:)`
 
-This package supports the following languages:
+Example:
 
-- English
-- Turkish
+```swift
+do {
+    let article: Article = try await client.execute(request, as: Article.self)
+    print(article)
+} catch let error as RestingError {
+    switch error {
+    case .statusCode(let code, _):
+        print("Unexpected status:", code)
+    case .cancelled:
+        print("Cancelled")
+    default:
+        print(error.localizedDescription)
+    }
+}
+```
 
-If you would like to contribute with translations for other languages, please open a new issue on our GitHub repository or submit a pull request.
+## Migration Guide
 
-## Contribute
+This release intentionally introduces source-breaking cleanup to remove the old
+flat API.
 
-We appreciate contributions! If you have any suggestions, feature requests, or bug reports, please open a new issue on our GitHub repository.
+- Replace `RequestConfiguration` with `RequestDefinition`.
+- Replace `fetch(with:)` with `execute(_:)`, `executeData(_:)`, or `execute(_:as:)`.
+- Replace ad hoc request payload overloads with `.query`, `.form`, `.json`, `.jsonData`, `.raw`, and `.download`.
+- Replace client-global `download(with:completion:progress:)` plus `cancel()` with per-operation `TransferHandle` instances.
+- Replace legacy `RestingError.urlMalformed`, `wrongParameterType`, and `unknown` handling with the richer typed error cases listed above.
 
 ## Development Standards
 
 Project standards for contributors are tracked in `.specify/memory/constitution.md`.
-Changes to public API are expected to include unit tests, public documentation
-comments, and English-first localization updates when user-facing strings
-change.
+Public API changes are expected to include tests, docs, and localized
+user-facing strings where applicable.
 
 ## License
 
-This package is available under the MIT license. See the LICENSE file for more info.
+This package is available under the MIT license. See [LICENSE](LICENSE).

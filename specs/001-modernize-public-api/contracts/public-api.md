@@ -101,6 +101,22 @@ it.
 - Every breaking change from the legacy API must be documented with migration
   guidance before release.
 
+## Migration Notes
+
+- `RequestConfiguration` is replaced by `RequestDefinition`.
+- `fetch(with:)` is replaced by `execute(_:)`, `executeData(_:)`, and `execute(_:as:)`.
+- Request construction now uses explicit `.query`, `.form`, `.json`, `.jsonData`, `.raw`, and `.download` entry points.
+- Client-global download callbacks and cancellation are replaced by per-operation `TransferHandle` instances.
+- Legacy error handling based on `urlMalformed`, `wrongParameterType`, and `unknown` is replaced by the canonical `RestingError` contract.
+
+## Release Notes Summary
+
+- Swift tools version upgraded to 6.2 and `visionOS` support reviewed in the package manifest.
+- Source and tests reorganized by domain under `Client`, `Requests`, `Responses`, `Transfers`, and `Support`.
+- Async/await is now the primary documented API, with Combine maintained as a compatibility layer.
+- Downloads now use isolated handles with independent progress and cancellation lifecycles.
+- English and Turkish error resources were refreshed to match the new error model.
+
 ## Test Contracts
 
 - Unit tests must cover:
