@@ -1,5 +1,0 @@
-prefix_rule(pattern=["bash", ".specify/extensions/git/scripts/bash/create-new-feature.sh"], decision="allow")
-prefix_rule(pattern=["rtk", "git", "add"], decision="allow")
-prefix_rule(pattern=["rtk", "git", "commit"], decision="allow")
-prefix_rule(pattern=["rtk", "swift", "test"], decision="allow")
-prefix_rule(pattern=["bash", ".specify/extensions/git/scripts/bash/auto-commit.sh"], decision="allow")
