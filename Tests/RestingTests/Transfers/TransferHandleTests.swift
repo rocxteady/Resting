@@ -84,4 +84,70 @@ final class TransferHandleTests: XCTestCase {
             }
         }
     }
+
+    func testImmediateFailureHandleFailsWithoutNetworkWork() async {
+        let handle = TransferHandle(immediateFailure: .cancelled)
+
+        XCTAssertEqual(handle.state, .failed)
+        XCTAssertEqual(handle.progress.totalUnitCount, 1)
+        XCTAssertEqual(handle.progress.completedUnitCount, 1)
+
+        do {
+            _ = try await handle.value
+            XCTFail("Immediate failure handle should not succeed.")
+        } catch let error as RestingError {
+            guard case .cancelled = error else {
+                return XCTFail("Expected cancelled error, got \(error)")
+            }
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testManualProgressAndTerminalStateTransitionsAreStable() async throws {
+        let session = URLSession(configuration: .ephemeral)
+        let task = session.downloadTask(with: URL(string: "https://example.com/archive.txt")!)
+        let handle = TransferHandle(task: task)
+        let completedURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+
+        handle.markRunning()
+        handle.didWrite(totalBytesWritten: 2, totalBytesExpectedToWrite: 10)
+
+        XCTAssertEqual(handle.state, .running)
+        XCTAssertEqual(handle.progress.totalUnitCount, 10)
+        XCTAssertEqual(handle.progress.completedUnitCount, 2)
+
+        handle.progress.totalUnitCount = 0
+        handle.finish(with: completedURL)
+        handle.finish(with: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+        handle.fail(with: URLError(.badServerResponse))
+
+        let resolvedURL = try await handle.value
+        XCTAssertEqual(resolvedURL, completedURL)
+        XCTAssertEqual(handle.state, .completed)
+        XCTAssertEqual(handle.progress.completedUnitCount, handle.progress.totalUnitCount)
+    }
+
+    func testFailMapsNonCancellationErrorsAndIgnoresRepeatedFailures() async {
+        let session = URLSession(configuration: .ephemeral)
+        let task = session.downloadTask(with: URL(string: "https://example.com/archive.txt")!)
+        let handle = TransferHandle(task: task)
+
+        handle.fail(with: URLError(.badServerResponse))
+        handle.fail(with: URLError(.cancelled))
+
+        do {
+            _ = try await handle.value
+            XCTFail("Failed handle should not succeed.")
+        } catch let error as RestingError {
+            guard case .transport(let urlError) = error else {
+                return XCTFail("Expected transport error, got \(error)")
+            }
+            XCTAssertEqual(urlError.code, .badServerResponse)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+
+        XCTAssertEqual(handle.state, .failed)
+    }
 }

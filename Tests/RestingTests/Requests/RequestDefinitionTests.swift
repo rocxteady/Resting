@@ -2,6 +2,31 @@ import XCTest
 @testable import Resting
 
 final class RequestDefinitionTests: XCTestCase {
+    func testDirectInitializerAppliesTimeoutCachePolicyAndMergesExistingQueryItems() throws {
+        let request = RequestDefinition(
+            url: URL(string: "https://example.com/articles?existing=true")!,
+            method: .put,
+            headers: [:],
+            queryItems: [URLQueryItem(name: "page", value: "2")],
+            body: .none,
+            timeout: 12,
+            cachePolicy: .reloadIgnoringLocalCacheData
+        )
+
+        let urlRequest = try request.makeURLRequest(defaultHeaders: [:], encoder: JSONEncoder())
+        let queryItems = try XCTUnwrap(
+            URLComponents(url: try XCTUnwrap(urlRequest.url), resolvingAgainstBaseURL: false)?.queryItems
+        )
+
+        XCTAssertEqual(urlRequest.httpMethod, "PUT")
+        XCTAssertEqual(urlRequest.timeoutInterval, 12)
+        XCTAssertEqual(urlRequest.cachePolicy, .reloadIgnoringLocalCacheData)
+        XCTAssertEqual(
+            Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) }),
+            ["existing": "true", "page": "2"]
+        )
+    }
+
     func testQueryRequestBuildsQueryItemsAndMethod() throws {
         let request = RequestDefinition.query(
             url: URL(string: "https://example.com/articles")!,
@@ -82,6 +107,49 @@ final class RequestDefinitionTests: XCTestCase {
         ) { error in
             guard case RestingError.invalidRequest = error else {
                 return XCTFail("Expected invalid request error, got \(error)")
+            }
+        }
+    }
+
+    func testRawRequestUsesExplicitContentTypeAndBody() throws {
+        let request = RequestDefinition.raw(
+            url: URL(string: "https://example.com/upload")!,
+            method: .patch,
+            body: Data("payload".utf8),
+            contentType: "text/plain"
+        )
+
+        let urlRequest = try request.makeURLRequest(defaultHeaders: [:], encoder: JSONEncoder())
+
+        XCTAssertEqual(urlRequest.httpMethod, "PATCH")
+        XCTAssertEqual(urlRequest.httpBody, Data("payload".utf8))
+        XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Content-Type"), "text/plain")
+    }
+
+    func testGetAndHeadRequestsRejectBodyContent() {
+        let encoder = JSONEncoder()
+        let requests: [RequestDefinition] = [
+            .jsonData(
+                url: URL(string: "https://example.com/articles")!,
+                method: .get,
+                body: Data("{}".utf8)
+            ),
+            .raw(
+                url: URL(string: "https://example.com/articles")!,
+                method: .head,
+                body: Data("payload".utf8),
+                contentType: "text/plain"
+            ),
+        ]
+
+        for request in requests {
+            XCTAssertThrowsError(
+                try request.makeURLRequest(defaultHeaders: [:], encoder: encoder)
+            ) { error in
+                guard case .invalidRequest(let reason) = error as? RestingError else {
+                    return XCTFail("Expected invalid request error, got \(error)")
+                }
+                XCTAssertTrue(reason.contains("do not support HTTP body content"))
             }
         }
     }

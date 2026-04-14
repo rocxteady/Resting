@@ -8,12 +8,23 @@ public final class RestClient: NSObject, @unchecked Sendable {
     public let configuration: RestClientConfiguration
 
     private let transferLock = NSLock()
-    lazy var session: URLSession = URLSession(
-        configuration: configuration.sessionConfiguration,
-        delegate: self,
-        delegateQueue: nil
-    )
-    private lazy var executor = URLSessionExecutor(session: session)
+    private var sessionStorage: URLSession?
+    var session: URLSession {
+        if let sessionStorage {
+            return sessionStorage
+        }
+
+        let session = URLSession(
+            configuration: configuration.sessionConfiguration,
+            delegate: self,
+            delegateQueue: nil
+        )
+        sessionStorage = session
+        return session
+    }
+    private var executor: URLSessionExecutor {
+        URLSessionExecutor(session: session)
+    }
     private var transfers: [Int: TransferHandle] = [:]
 
     /// Creates a client from a reusable configuration value.
@@ -23,7 +34,7 @@ public final class RestClient: NSObject, @unchecked Sendable {
     }
 
     deinit {
-        session.invalidateAndCancel()
+        sessionStorage?.invalidateAndCancel()
     }
 
     /// Executes a request and returns the validated raw payload.
