@@ -106,6 +106,13 @@ If you would like to contribute with translations for other languages, please op
 
 We appreciate contributions! If you have any suggestions, feature requests, or bug reports, please open a new issue on our GitHub repository.
 
+## Development Standards
+
+Project standards for contributors are tracked in `.specify/memory/constitution.md`.
+Changes to public API are expected to include unit tests, public documentation
+comments, and English-first localization updates when user-facing strings
+change.
+
 ## License
 
 This package is available under the MIT license. See the LICENSE file for more info.
