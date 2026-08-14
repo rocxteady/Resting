@@ -1,18 +1,20 @@
 {
   "integration": "speckit",
-  "version": "0.6.3.dev0",
+  "version": "0.16.4",
   "installed_at": "2026-04-14T12:57:31.751626+00:00",
   "files": {
-    ".specify/scripts/bash/common.sh": "2b767a5c97d0c8c8f0a868aaa2114f170adfb1921749f4e58675da91382defb7",
-    ".specify/scripts/bash/setup-plan.sh": "bcaa0ccbf45b7d9ea9bff04006500d7eb28a2bdf82bcc819986b21e5294bf76c",
-    ".specify/scripts/bash/check-prerequisites.sh": "aff361639c504b95a2901493f5022788adc01a6792fd37f132de8f57782e4b80",
-    ".specify/scripts/bash/update-agent-context.sh": "45bb80ad9095426d49ca951b680817ff965c4f1d57217faa1fa441dbbd2a21db",
-    ".specify/scripts/bash/create-new-feature.sh": "3439519f72ce6f88fcd4dcd27346de0c9ffe211c927b1319db42850282f02456",
+    ".specify/scripts/bash/common.sh": "c552063e4c18818b6f6a924a0b638835a8bcb6bd166053b103cc1ef5096f6525",
+    ".specify/scripts/bash/setup-plan.sh": "061cec0c6d71f8f88008b4d3d7f5bbc2bfbdb85d734d9e73fc5f07a3c60c88a6",
+    ".specify/scripts/bash/check-prerequisites.sh": "d918a297a3d8f4fc864d04ad7d4f35626f2b136ff9d5a3ad13a0591253408fde",
+    ".specify/scripts/bash/create-new-feature.sh": "fe99ea8da184380056ce8512ca5d37f67fb499ee4234835c15dcf7c4fb75451c",
     ".specify/templates/agent-file-template.md": "55ed438c2e861444ef22f45fe5238f3ebf0dc1cb6e53067d7232fbbf4ce82892",
     ".specify/templates/constitution-template.md": "ce7549540fa45543cca797a150201d868e64495fdff39dc38246fb17bd4024b3",
-    ".specify/templates/checklist-template.md": "312eee8291dfa984b21f95ddd0ca778e7a1f0b3a64bfc470d79762a3e3f5d7b8",
-    ".specify/templates/tasks-template.md": "5da92ac1fbf5be2f9018a5064497995bf3592761ccb6b3951503c63d851297e8",
-    ".specify/templates/spec-template.md": "785dc50d856dd92d6515eca0761e16dce0c9ba0a3cd07154fd33eae77932422a",
-    ".specify/templates/plan-template.md": "873e84b226fe3d24afe28046931b20db9bbb9210366428dc958a515349ed6e68"
+    ".specify/templates/checklist-template.md": "70bbc48e884fab372ffb09e83e78ff983e28b69caebf8cd9964a02b6836683ac",
+    ".specify/templates/tasks-template.md": "b0f527d41e546af0c31903e04f9b20965b6b497b573792198f663a64ce128863",
+    ".specify/templates/spec-template.md": "3945437fc35cd30a5b2bf7beea680337c3516826d3efa5a6b92c4a7eca1ba28e",
+    ".specify/templates/plan-template.md": "a828ad6206526574ab3fc99be6d0154588cb1c9774c5919d71b81ab5b2dbffa0",
+    ".specify/scripts/bash/setup-tasks.sh": "0350b2def158c4dc333cd888fc5a3b10785b3d5c2cf936f93e910242ea9d507d",
+    ".specify/scripts/bash/resolve-template.sh": "829e227096abc8bf0889889ec9f792f503ca5d395b7836a8a7eb739ee75214e7",
+    ".specify/.gitignore": "8c908410d177a1ef3d0dee16d7ad55f2ac3333df3104c4d4adee1c9b82f1dbc1"
   }
 }

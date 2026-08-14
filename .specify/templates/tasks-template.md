@@ -6,10 +6,10 @@ description: "Task list template for feature implementation"
 # Tasks: [FEATURE NAME]
 
 **Input**: Design documents from `/specs/[###-feature-name]/`
+
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: Unit tests are REQUIRED. Add integration, contract, or platform
-coverage tasks when the feature or specification justifies them.
+**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -21,27 +21,26 @@ coverage tasks when the feature or specification justifies them.
 
 ## Path Conventions
 
-- **Swift package sources**: `Sources/Resting/`
-- **Swift package tests**: `Tests/RestingTests/`
-- **Mocks and fixtures**: `Tests/RestingTests/Mocks/`
-- **Localized resources**: `Sources/Resting/Resources/`
-- Adjust paths only if the plan explicitly adds a new target or package layout
+- **Single project**: `src/`, `tests/` at repository root
+- **Web app**: `backend/src/`, `frontend/src/`
+- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
+- Paths shown below assume single project - adjust based on plan.md structure
 
-<!-- 
+<!--
   ============================================================================
   IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
-  The /speckit.tasks command MUST replace these with actual tasks based on:
+
+  The $speckit-tasks command MUST replace these with actual tasks based on:
   - User stories from spec.md (with their priorities P1, P2, P3...)
   - Feature requirements from plan.md
   - Entities from data-model.md
   - Endpoints from contracts/
-  
+
   Tasks MUST be organized by user story so each story can be:
   - Implemented independently
   - Tested independently
   - Delivered as an MVP increment
-  
+
   DO NOT keep these sample tasks in the generated tasks.md file.
   ============================================================================
 -->
@@ -50,12 +49,9 @@ coverage tasks when the feature or specification justifies them.
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Update `Package.swift` and package metadata if the feature changes
-      platform support, products, or dependencies
-- [ ] T002 Create or adjust source and test files under `Sources/Resting/` and
-      `Tests/RestingTests/` per the implementation plan
-- [ ] T003 [P] Configure or update linting, formatting, and CI steps if the
-      feature requires them
+- [ ] T001 Create project structure per implementation plan
+- [ ] T002 Initialize [language] project with [framework] dependencies
+- [ ] T003 [P] Configure linting and formatting tools
 
 ---
 
@@ -67,15 +63,12 @@ coverage tasks when the feature or specification justifies them.
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Establish or extend shared request/response models and supporting
-      types in `Sources/Resting/`
-- [ ] T005 [P] Add or update deterministic mocks, fixtures, or helpers in
-      `Tests/RestingTests/Mocks/`
-- [ ] T006 [P] Define availability handling, error mapping, and concurrency
-      boundaries needed by all stories
-- [ ] T007 Identify public API documentation updates required across the change
-- [ ] T008 Confirm localization resource impact in
-      `Sources/Resting/Resources/`
+- [ ] T004 Setup database schema and migrations framework
+- [ ] T005 [P] Implement authentication/authorization framework
+- [ ] T006 [P] Setup API routing and middleware structure
+- [ ] T007 Create base models/entities that all stories depend on
+- [ ] T008 Configure error handling and logging infrastructure
+- [ ] T009 Setup environment configuration management
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -87,24 +80,21 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 ⚠️
+### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T009 [P] [US1] Add or update unit tests in
-      `Tests/RestingTests/[Feature]Tests.swift`
-- [ ] T010 [P] [US1] Add concurrency, cancellation, or availability coverage
-      when async behavior or platform gating changes
+- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Implement or update types in `Sources/Resting/[File].swift`
-- [ ] T012 [US1] Wire the feature into the request/response flow and error
-      handling paths
-- [ ] T013 [US1] Add public documentation comments and availability annotations
-      for changed public APIs
-- [ ] T014 [US1] Update English localization resources if user-facing strings
-      change
+- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
+- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
+- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
+- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T016 [US1] Add validation and error handling
+- [ ] T017 [US1] Add logging for user story 1 operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -116,20 +106,17 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 ⚠️
+### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T015 [P] [US2] Add or update unit tests in
-      `Tests/RestingTests/[Feature]Tests.swift`
-- [ ] T016 [P] [US2] Add concurrency, cancellation, or platform coverage if the
-      story changes those behaviors
+- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
 
 ### Implementation for User Story 2
 
-- [ ] T017 [P] [US2] Implement or update types in `Sources/Resting/[File].swift`
-- [ ] T018 [US2] Integrate the story with shared request, response, and error
-      handling components
-- [ ] T019 [US2] Add public documentation comments, availability notes, and
-      localization updates required by the story
+- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
+- [ ] T021 [US2] Implement [Service] in src/services/[service].py
+- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -141,20 +128,16 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 ⚠️
+### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T020 [P] [US3] Add or update unit tests in
-      `Tests/RestingTests/[Feature]Tests.swift`
-- [ ] T021 [P] [US3] Add concurrency, cancellation, or platform coverage if the
-      story changes those behaviors
+- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
 
 ### Implementation for User Story 3
 
-- [ ] T022 [P] [US3] Implement or update types in `Sources/Resting/[File].swift`
-- [ ] T023 [US3] Integrate the story with shared request, response, and error
-      handling components
-- [ ] T024 [US3] Add public documentation comments, availability notes, and
-      localization updates required by the story
+- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
+- [ ] T027 [US3] Implement [Service] in src/services/[service].py
+- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -168,11 +151,11 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] Documentation updates in `README.md`, DocC, or public API comments
-- [ ] TXXX Code cleanup and refactoring that removes unnecessary abstraction
-- [ ] TXXX Performance optimization across affected request paths
-- [ ] TXXX [P] Additional unit and platform coverage in `Tests/RestingTests/`
-- [ ] TXXX Verify localization resources and supported-platform behavior
+- [ ] TXXX [P] Documentation updates in docs/
+- [ ] TXXX Code cleanup and refactoring
+- [ ] TXXX Performance optimization across all stories
+- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
+- [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
 
 ---
@@ -196,9 +179,10 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Unit tests MUST be written and FAIL before implementation
-- Shared types before higher-level feature wiring
-- Core implementation before public API polish and localization updates
+- Tests (if included) MUST be written and FAIL before implementation
+- Models before services
+- Services before endpoints
+- Core implementation before integration
 - Story complete before moving to next priority
 
 ### Parallel Opportunities
@@ -215,13 +199,13 @@ Examples of foundational tasks (adjust based on your project):
 ## Parallel Example: User Story 1
 
 ```bash
-# Launch all tests for User Story 1 together:
-Task: "Add or update unit tests in Tests/RestingTests/[Feature]Tests.swift"
-Task: "Add concurrency, cancellation, or platform coverage for User Story 1"
+# Launch all tests for User Story 1 together (if tests requested):
+Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
+Task: "Integration test for [user journey] in tests/integration/test_[name].py"
 
-# Launch independent implementation tasks for User Story 1 together:
-Task: "Implement or update types in Sources/Resting/[File].swift"
-Task: "Add public documentation comments and availability annotations"
+# Launch all models for User Story 1 together:
+Task: "Create [Entity1] model in src/models/[entity1].py"
+Task: "Create [Entity2] model in src/models/[entity2].py"
 ```
 
 ---
@@ -262,8 +246,7 @@ With multiple developers:
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
-- Verify unit tests fail before implementing
+- Verify tests fail before implementing
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, undocumented public API changes, and
-  cross-story dependencies that break independence
+- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence

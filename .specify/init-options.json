@@ -6,5 +6,5 @@
   "integration": "codex",
   "preset": null,
   "script": "sh",
-  "speckit_version": "0.6.3.dev0"
+  "speckit_version": "0.16.4"
 }

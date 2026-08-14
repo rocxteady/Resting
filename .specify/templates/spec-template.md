@@ -1,8 +1,11 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
+**Feature Branch**: `[###-feature-name]`
+
+**Created**: [DATE]
+
+**Status**: Draft
+
 **Input**: User description: "$ARGUMENTS"
 
 ## User Scenarios & Testing *(mandatory)*
@@ -11,7 +14,7 @@
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
-  
+
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
   - Developed independently
@@ -68,17 +71,12 @@
 ### Edge Cases
 
 <!--
-  ACTION REQUIRED: Replace these prompts with feature-specific edge cases.
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right edge cases.
 -->
 
-- What happens when the request is cancelled, retried, or overlaps with another
-  async operation?
-- How does the feature behave on unsupported Apple platform versions or when an
-  API requires availability gating?
-- What is the fallback behavior for malformed responses, empty bodies, or
-  decoding failures?
-- If user-facing text changes, how does English default localization behave when
-  another locale is missing a translation?
+- What happens when [boundary condition]?
+- How does system handle [error scenario]?
 
 ## Requirements *(mandatory)*
 
@@ -89,33 +87,16 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "build a GET request with
-  headers and query items"]
-- **FR-002**: System MUST [specific capability, e.g., "decode responses into a
-  `Decodable` model"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "configure request
-  body, headers, and HTTP method"]
-- **FR-004**: System MUST [behavior, e.g., "surface deterministic error values
-  for transport, status-code, and decoding failures"]
-- **FR-005**: Any changed public API MUST include Swift documentation comments
-  and preserve a simple call surface unless a documented requirement forces
-  added complexity
+- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
+- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
+- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
+- **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
-
-## Compatibility & API Impact *(mandatory)*
-
-- **Public API Impact**: [List any public types, methods, parameters, or
-  breaking changes. State "None" if the change is internal only.]
-- **Platform Impact**: [State affected Apple platforms, minimum OS changes, and
-  any availability-gated behavior.]
-- **Concurrency Impact**: [State any async/await, actor isolation, `Sendable`,
-  cancellation, or threading implications.]
-- **Localization Impact**: [State whether English resources change and whether
-  additional locales must be updated.]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -144,11 +125,7 @@
   chosen when the feature description did not specify certain details.
 -->
 
-- [Assumption about target users, e.g., "Library consumers are integrating from
-  Apple-platform apps or services with URLSession available"]
-- [Assumption about scope boundaries, e.g., "The feature extends the existing
-  SPM library rather than creating a new target"]
-- [Assumption about data/environment, e.g., "Tests use mocks or fixtures rather
-  than live network services"]
-- [Assumption about documentation/localization, e.g., "English documentation and
-  default localized strings are updated in the same change"]
+- [Assumption about target users, e.g., "Users have stable internet connectivity"]
+- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
+- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
