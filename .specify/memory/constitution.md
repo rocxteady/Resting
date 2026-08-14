@@ -1,33 +1,23 @@
 <!--
 Sync Impact Report
-Version change: template -> 1.0.0
+Version change: 1.0.0 -> 1.0.1
 Modified principles:
-- PRINCIPLE_1_NAME -> I. Swift 6.2 and Strict Concurrency
-- PRINCIPLE_2_NAME -> II. Simplicity Over Abstraction
-- PRINCIPLE_3_NAME -> III. Documented Public API
-- PRINCIPLE_4_NAME -> IV. Test-Backed Behavior
-- PRINCIPLE_5_NAME -> V. Platform and Localization Discipline
+- I. Swift 6.2 and Strict Concurrency -> I. Swift 6.3 and Strict Concurrency
 Added sections:
-- Technical Standards
-- Workflow & Quality Gates
+- None
 Removed sections:
 - None
 Templates requiring updates:
-- ✅ updated: .specify/templates/plan-template.md
-- ✅ updated: .specify/templates/spec-template.md
-- ✅ updated: .specify/templates/tasks-template.md
-- ✅ updated: README.md
-- ✅ reviewed: .specify/templates/commands/ (directory not present; no template command files to update)
+- ✅ reviewed: no template changes required for the toolchain baseline update
 Follow-up TODOs:
-- Align `Package.swift` and CI with Swift 6.2 plus visionOS support when the
-  implementation upgrade begins
+- Align `Package.swift` and CI with Swift 6.3 during 002-resting-modernization
 -->
 # Resting Constitution
 
 ## Core Principles
 
-### I. Swift 6.2 and Strict Concurrency
-All production and test code MUST target Swift 6.2 in Swift Package Manager and
+### I. Swift 6.3 and Strict Concurrency
+All production and test code MUST target Swift 6.3 in Swift Package Manager and
 MUST be designed for the most recent strict concurrency enforcement available in
 the toolchain used by the project. Actor isolation, `Sendable` conformance,
 cancellation, and async boundaries MUST be explicit in API and implementation
@@ -87,7 +77,7 @@ fallback.
 
 ## Workflow & Quality Gates
 
-- Every implementation plan MUST pass a constitution check covering Swift 6.2,
+- Every implementation plan MUST pass a constitution check covering Swift 6.3,
   strict concurrency, simplicity, public API documentation, tests, platform
   impact, and localization impact.
 - Every specification MUST state public API impact, concurrency impact, platform
@@ -116,4 +106,4 @@ Compliance review is mandatory for every specification, plan, task list, and
 code review. Any temporary deviation MUST be recorded in the relevant plan or
 review with the reason, scope, and removal path before implementation proceeds.
 
-**Version**: 1.0.0 | **Ratified**: 2026-04-14 | **Last Amended**: 2026-04-14
+**Version**: 1.0.1 | **Ratified**: 2026-04-14 | **Last Amended**: 2026-08-14
