@@ -1,0 +1,11 @@
+{"event": "step_started", "step_id": "load-spec", "type": "shell", "timestamp": "2026-08-14T22:28:06.476200+00:00"}
+{"event": "step_completed", "step_id": "load-spec", "status": "completed", "timestamp": "2026-08-14T22:28:06.521207+00:00"}
+{"event": "step_started", "step_id": "specify", "type": "command", "timestamp": "2026-08-14T22:28:06.521921+00:00"}
+{"event": "step_completed", "step_id": "specify", "status": "completed", "timestamp": "2026-08-14T22:31:10.586217+00:00"}
+{"event": "step_started", "step_id": "plan", "type": "command", "timestamp": "2026-08-14T22:31:10.588761+00:00"}
+{"event": "step_completed", "step_id": "plan", "status": "completed", "timestamp": "2026-08-14T22:40:16.546816+00:00"}
+{"event": "step_started", "step_id": "tasks", "type": "command", "timestamp": "2026-08-14T22:40:16.549289+00:00"}
+{"event": "step_completed", "step_id": "tasks", "status": "completed", "timestamp": "2026-08-14T22:42:56.201818+00:00"}
+{"event": "step_started", "step_id": "implement", "type": "command", "timestamp": "2026-08-14T22:42:56.205068+00:00"}
+{"event": "step_completed", "step_id": "implement", "status": "completed", "timestamp": "2026-08-14T23:00:22.265188+00:00"}
+{"event": "workflow_finished", "status": "completed", "timestamp": "2026-08-14T23:00:22.266918+00:00"}

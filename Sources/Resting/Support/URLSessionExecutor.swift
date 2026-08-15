@@ -5,17 +5,15 @@ import Foundation
 
 struct URLSessionExecutor {
     private let session: URLSession
-    private let validator: ResponseValidator
 
-    init(session: URLSession, validator: ResponseValidator = .init()) {
+    init(session: URLSession) {
         self.session = session
-        self.validator = validator
     }
 
     func execute(_ request: URLRequest) async throws -> ResponsePayload<Data> {
         do {
             let (data, response) = try await session.data(for: request)
-            let httpResponse = try validator.validate(data: data, response: response)
+            let httpResponse = try ResponseValidator().validate(data: data, response: response)
             return ResponsePayload(value: data, response: httpResponse)
         } catch {
             throw RestingError.map(error)

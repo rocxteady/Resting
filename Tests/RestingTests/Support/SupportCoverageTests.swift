@@ -64,6 +64,61 @@ final class SupportCoverageTests: XCTestCase {
         XCTAssertEqual(reason, "fallback message")
     }
 
+    func testResponseValidatorRejectsMissingAndNonHTTPResponses() {
+        let validator = ResponseValidator()
+
+        XCTAssertThrowsError(try validator.validate(data: Data(), response: nil)) { error in
+            guard case .invalidResponse = error as? RestingError else {
+                return XCTFail("Expected invalid response, got \(error)")
+            }
+        }
+
+        XCTAssertThrowsError(
+            try validator.validate(
+                data: Data(),
+                response: URLResponse(
+                    url: URL(string: "https://example.com/articles")!,
+                    mimeType: nil,
+                    expectedContentLength: 0,
+                    textEncodingName: nil
+                )
+            )
+        ) { error in
+            guard case .invalidResponse = error as? RestingError else {
+                return XCTFail("Expected invalid response, got \(error)")
+            }
+        }
+    }
+
+    func testResponseValidatorAcceptsOnlyTwoHundredsAndPreservesNonEmptyErrorBodies() throws {
+        let validator = ResponseValidator()
+        let success = HTTPURLResponse(
+            url: URL(string: "https://example.com/articles")!,
+            statusCode: 299,
+            httpVersion: nil,
+            headerFields: nil
+        )!
+        XCTAssertEqual(try validator.validate(data: Data(), response: success).statusCode, 299)
+
+        let errorData = Data("not found".utf8)
+        let response = HTTPURLResponse(
+            url: URL(string: "https://example.com/articles")!,
+            statusCode: 404,
+            httpVersion: nil,
+            headerFields: nil
+        )!
+
+        XCTAssertThrowsError(
+            try validator.validate(data: errorData, response: response)
+        ) { error in
+            guard case .statusCode(let statusCode, let data) = error as? RestingError else {
+                return XCTFail("Expected status code error, got \(error)")
+            }
+            XCTAssertEqual(statusCode, 404)
+            XCTAssertEqual(data, errorData)
+        }
+    }
+
     func testResponseValidatorOmitsEmptyErrorBodies() throws {
         let validator = ResponseValidator()
         let response = HTTPURLResponse(
@@ -82,19 +137,6 @@ final class SupportCoverageTests: XCTestCase {
             XCTAssertEqual(statusCode, 404)
             XCTAssertNil(data)
         }
-    }
-
-    func testResponseValidatorRespectsCustomAcceptableStatusCodes() throws {
-        let validator = ResponseValidator(acceptableStatusCodes: 300..<400)
-        let response = HTTPURLResponse(
-            url: URL(string: "https://example.com/articles")!,
-            statusCode: 304,
-            httpVersion: nil,
-            headerFields: nil
-        )!
-
-        let validated = try validator.validate(data: Data(), response: response)
-        XCTAssertEqual(validated.statusCode, 304)
     }
 
     func testFoundationNetworkingSupportReportsAvailability() {

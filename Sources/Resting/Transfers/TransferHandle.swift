@@ -5,15 +5,21 @@ import Foundation
 
 /// Represents one in-flight download and its lifecycle.
 public final class TransferHandle: @unchecked Sendable {
-    /// Current transfer lifecycle state.
+    /// A transfer's current lifecycle state.
     public enum State: Sendable {
+        /// The transfer has been created but not started.
         case initialized
+        /// The transfer is in progress.
         case running
+        /// The transfer completed with a validated file.
         case completed
+        /// The transfer failed.
         case failed
+        /// The transfer was cancelled.
         case cancelled
     }
 
+    /// The stable identifier for this transfer.
     public let id: UUID
 
     /// `Progress` for this transfer only.
@@ -47,7 +53,10 @@ public final class TransferHandle: @unchecked Sendable {
         return stateStorage
     }
 
-    /// Awaits the downloaded file URL for this transfer.
+    /// Awaits the validated downloaded file URL for this transfer.
+    ///
+    /// - Throws: A `RestingError` for cancellation, invalid responses,
+    ///   non-2xx status codes, transport failures, or file-system failures.
     public var value: URL {
         get async throws {
             try await resultBox.value()
@@ -55,6 +64,8 @@ public final class TransferHandle: @unchecked Sendable {
     }
 
     /// Registers a progress observer for this handle only.
+    ///
+    /// - Parameter observer: A callback invoked outside the handle's state lock.
     public func observeProgress(_ observer: @escaping (Progress) -> Void) {
         lock.lock()
         observers.append(observer)
@@ -89,9 +100,10 @@ extension TransferHandle {
         callbacks.forEach { $0(currentProgress) }
     }
 
-    func finish(with fileURL: URL) {
+    @discardableResult
+    func finish(with fileURL: URL) -> Bool {
         guard transitionToTerminal(.completed) else {
-            return
+            return false
         }
 
         lock.lock()
@@ -105,6 +117,7 @@ extension TransferHandle {
 
         resultBox.resolve(.success(fileURL))
         callbacks.forEach { $0(currentProgress) }
+        return true
     }
 
     func fail(with error: Error) {

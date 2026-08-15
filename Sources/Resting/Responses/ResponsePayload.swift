@@ -5,7 +5,10 @@ import Foundation
 
 /// Represents a validated response value with HTTP metadata.
 public struct ResponsePayload<Value> {
+    /// The raw or decoded response value.
     public let value: Value
+
+    /// The final successful HTTP response.
     public let response: HTTPURLResponse
 
     /// Returns the validated status code.

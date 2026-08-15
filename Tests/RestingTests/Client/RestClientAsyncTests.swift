@@ -111,6 +111,94 @@ final class RestClientAsyncTests: XCTestCase {
         XCTAssertEqual(payload.headers["X-Trace"], "trace-id")
     }
 
+    func testAsyncDecodingFailuresPreserveEmptyAndNonEmptyResponseData() async {
+        struct Article: Decodable {
+            let title: String
+        }
+
+        for responseData in [Data(), Data("{\"wrong\":\"shape\"}".utf8)] {
+            MockURLProtocol.setRequestHandler { request in
+                .init(
+                    response: HTTPURLResponse(
+                        url: try XCTUnwrap(request.url),
+                        statusCode: 200,
+                        httpVersion: nil,
+                        headerFields: nil
+                    ),
+                    data: responseData
+                )
+            }
+
+            let client = RestClient(
+                configuration: RestClientConfiguration(sessionConfiguration: configuration)
+            )
+            do {
+                let _: Article = try await client.execute(
+                    .query(url: URL(string: "https://example.com/async-decoding")!)
+                )
+                XCTFail("Invalid JSON should fail decoding.")
+            } catch let error as RestingError {
+                guard case .decoding(_, let data) = error else {
+                    return XCTFail("Expected decoding error, got \(error)")
+                }
+                XCTAssertEqual(data, responseData)
+            } catch {
+                XCTFail("Unexpected error: \(error)")
+            }
+        }
+    }
+
+    func testAsyncFailureMatrixPreservesTypedResponseAndTransportContext() async {
+        MockURLProtocol.setRequestHandler { request in
+            switch request.url?.lastPathComponent {
+            case "invalid":
+                return .init(
+                    response: URLResponse(
+                        url: try XCTUnwrap(request.url),
+                        mimeType: nil,
+                        expectedContentLength: 0,
+                        textEncodingName: nil
+                    )
+                )
+            case "status":
+                return .init(
+                    response: HTTPURLResponse(
+                        url: try XCTUnwrap(request.url),
+                        statusCode: 429,
+                        httpVersion: nil,
+                        headerFields: nil
+                    ),
+                    data: Data("retry later".utf8)
+                )
+            case "cancelled":
+                return .init(response: nil, error: URLError(.cancelled))
+            default:
+                return .init(response: nil, error: URLError(.notConnectedToInternet))
+            }
+        }
+
+        let client = RestClient(
+            configuration: RestClientConfiguration(sessionConfiguration: configuration)
+        )
+
+        await assertExecuteFailure(client, path: "invalid") {
+            guard case .invalidResponse = $0 else { return false }
+            return true
+        }
+        await assertExecuteFailure(client, path: "status") {
+            guard case .statusCode(429, let data) = $0 else { return false }
+            return data == Data("retry later".utf8)
+        }
+        await assertExecuteFailure(client, path: "transport") {
+            guard case .transport(let error) = $0 else { return false }
+            return error.code == .notConnectedToInternet
+        }
+        await assertExecuteFailure(client, path: "cancelled") {
+            guard case .cancelled = $0 else { return false }
+            return true
+        }
+    }
+
     func testDownloadRejectsNonDownloadRequestsImmediately() async {
         let client = RestClient(
             configuration: RestClientConfiguration(sessionConfiguration: configuration)
@@ -132,39 +220,19 @@ final class RestClientAsyncTests: XCTestCase {
         }
     }
 
-    func testDownloadDelegateIgnoresUnknownTasks() throws {
-        let client = RestClient(
-            configuration: RestClientConfiguration(sessionConfiguration: configuration)
-        )
-        let orphanTask = client.session.downloadTask(with: URL(string: "https://example.com/orphan.txt")!)
-        let orphanLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-
-        client.urlSession(client.session, downloadTask: orphanTask, didFinishDownloadingTo: orphanLocation)
-        client.urlSession(client.session, task: orphanTask, didCompleteWithError: nil)
-    }
-
     func testDownloadDelegateMapsFileMoveFailuresToFileSystemError() async throws {
-        MockURLProtocol.setRequestHandler { request in
-            .init(
-                response: HTTPURLResponse(
-                    url: try XCTUnwrap(request.url),
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
-                data: DownloadFixture.data,
-                delay: 0.25
-            )
-        }
-
-        let client = RestClient(
-            configuration: RestClientConfiguration(sessionConfiguration: configuration)
+        let session = URLSession(configuration: .ephemeral)
+        let task = session.downloadTask(with: URL(string: "https://example.com/archive.txt")!)
+        let handle = TransferHandle(task: task)
+        let response = HTTPURLResponse(
+            url: URL(string: "https://example.com/archive.txt")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
         )
-        let handle = client.download(.download(url: URL(string: "https://example.com/archive.txt")!))
-        let task = try await activeDownloadTask(in: client.session)
         let missingLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
-        client.urlSession(client.session, downloadTask: task, didFinishDownloadingTo: missingLocation)
+        finishDownload(at: missingLocation, response: response, handle: handle)
 
         do {
             _ = try await handle.value
@@ -178,18 +246,107 @@ final class RestClientAsyncTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
 
-        task.cancel()
-        client.urlSession(client.session, task: task, didCompleteWithError: nil)
+        session.invalidateAndCancel()
     }
 
-    private func activeDownloadTask(in session: URLSession) async throws -> URLSessionDownloadTask {
-        try await withCheckedThrowingContinuation { continuation in
-            session.getAllTasks { tasks in
-                guard let task = tasks.compactMap({ $0 as? URLSessionDownloadTask }).first else {
-                    return continuation.resume(throwing: RestingError.invalidRequest(reason: "Expected a download task."))
+    func testConcurrentFirstUseSharesOneSessionAndOverlapsRequests() async throws {
+        MockURLProtocol.setRequestHandler { request in
+            .init(
+                response: HTTPURLResponse(
+                    url: try XCTUnwrap(request.url),
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                ),
+                data: Data("ok".utf8),
+                delay: 0.05
+            )
+        }
+
+        let client = RestClient(
+            configuration: RestClientConfiguration(sessionConfiguration: configuration)
+        )
+        let sessionIdentifiers = try await withThrowingTaskGroup(of: ObjectIdentifier.self) { group in
+            for index in 0..<20 {
+                group.addTask {
+                    _ = try await client.executeData(
+                        .query(url: URL(string: "https://example.com/request-\(index)")!)
+                    )
+                    return ObjectIdentifier(client.session)
                 }
-                continuation.resume(returning: task)
+            }
+
+            return try await group.reduce(into: Set<ObjectIdentifier>()) { $0.insert($1) }
+        }
+
+        XCTAssertEqual(sessionIdentifiers.count, 1)
+        XCTAssertGreaterThan(MockURLProtocol.observedMaximumActiveRequestCount, 1)
+    }
+
+    func testClientSessionAndDelegateEventuallyDeallocateWithoutShutdown() async throws {
+        MockURLProtocol.setRequestHandler { request in
+            .init(
+                response: HTTPURLResponse(
+                    url: try XCTUnwrap(request.url),
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                ),
+                data: Data("ok".utf8)
+            )
+        }
+
+        weak var weakClient: RestClient?
+        weak var weakSession: URLSession?
+        weak var weakDelegate: AnyObject?
+
+        do {
+            var client: RestClient? = RestClient(
+                configuration: RestClientConfiguration(sessionConfiguration: configuration)
+            )
+            weakClient = client
+            weakSession = client?.session
+            weakDelegate = client?.session.delegate as AnyObject?
+            _ = try await client?.executeData(
+                .query(url: URL(string: "https://example.com/lifecycle")!)
+            )
+            client = nil
+        }
+
+        for _ in 0..<100 where weakClient != nil || weakSession != nil || weakDelegate != nil {
+            await pauseForLifecycleCallbacks()
+        }
+
+        XCTAssertNil(weakClient)
+        XCTAssertNil(weakSession)
+        XCTAssertNil(weakDelegate)
+    }
+
+    private func pauseForLifecycleCallbacks() async {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.01) {
+                continuation.resume()
             }
         }
     }
+
+    private func assertExecuteFailure(
+        _ client: RestClient,
+        path: String,
+        matches: (RestingError) -> Bool,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async {
+        do {
+            _ = try await client.executeData(
+                .query(url: URL(string: "https://example.com/\(path)")!)
+            )
+            XCTFail("Expected \(path) request to fail.", file: file, line: line)
+        } catch let error as RestingError {
+            XCTAssertTrue(matches(error), "Unexpected error: \(error)", file: file, line: line)
+        } catch {
+            XCTFail("Unexpected error: \(error)", file: file, line: line)
+        }
+    }
+
 }

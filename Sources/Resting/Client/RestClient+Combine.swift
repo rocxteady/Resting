@@ -6,7 +6,13 @@ import Foundation
 import Combine
 
 extension RestClient {
-    /// Executes a request and publishes its validated raw payload.
+    /// Publishes a request's validated raw payload.
+    ///
+    /// - Parameter request: The request to execute.
+    /// - Returns: A publisher that emits bytes and HTTP metadata for a
+    ///   `200..<300` response or a typed `RestingError`.
+    /// - Note: The publisher retains this client while it or an active
+    ///   subscription is retained.
     public func publisher(for request: RequestDefinition) -> AnyPublisher<ResponsePayload<Data>, RestingError> {
         do {
             let urlRequest = try request.makeURLRequest(
@@ -16,9 +22,9 @@ extension RestClient {
 
             return session.dataTaskPublisher(for: urlRequest)
                 .mapError { RestingError.map($0) }
-                .tryMap { output in
-                    let validator = ResponseValidator()
-                    let httpResponse = try validator.validate(data: output.data, response: output.response)
+                .tryMap { [self] output in
+                    _ = self
+                    let httpResponse = try ResponseValidator().validate(data: output.data, response: output.response)
                     return ResponsePayload(value: output.data, response: httpResponse)
                 }
                 .mapError { RestingError.map($0) }
@@ -28,24 +34,38 @@ extension RestClient {
         }
     }
 
-    /// Executes a request and publishes its raw response data.
+    /// Publishes a request's validated raw response data.
+    ///
+    /// - Parameter request: The request to execute.
+    /// - Returns: A publisher that emits bytes for a `200..<300` response or a
+    ///   typed `RestingError`.
     public func dataPublisher(for request: RequestDefinition) -> AnyPublisher<Data, RestingError> {
         publisher(for: request)
             .map(\.value)
             .eraseToAnyPublisher()
     }
 
-    /// Executes a request and publishes its decoded response value.
+    /// Publishes a request's decoded response value.
+    ///
+    /// - Parameters:
+    ///   - request: The request to execute.
+    ///   - type: The response value type.
+    /// - Returns: A publisher that emits the decoded value or a typed
+    ///   `RestingError`; decoding failures retain the original response bytes.
     public func publisher<T: Decodable>(
         for request: RequestDefinition,
         as type: T.Type = T.self
     ) -> AnyPublisher<T, RestingError> {
         publisher(for: request)
             .tryMap { [self] payload in
-                try self.configuration.decoder.decode(type, from: payload.value)
+                do {
+                    return try self.configuration.decoder.decode(type, from: payload.value)
+                } catch {
+                    throw RestingError.map(error, responseData: payload.value)
+                }
             }
             .mapError { RestingError.map($0) }
-                .eraseToAnyPublisher()
+            .eraseToAnyPublisher()
     }
 }
 #endif

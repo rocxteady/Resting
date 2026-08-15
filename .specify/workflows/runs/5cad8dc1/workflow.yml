@@ -1,0 +1,30 @@
+schema_version: '1.0'
+workflow:
+  id: finish-resting-modernization
+  name: Finish Resting Modernization
+  version: 1.0.0
+  author: Resting
+  description: Fixes the verified Resting modernization gaps with Codex.
+requires:
+  speckit_version: '>=0.16.4'
+  integrations:
+    any:
+    - codex
+steps:
+- id: load-spec
+  type: shell
+  run: rtk cat "$SPECKIT_WORKFLOW_DIR/002-resting-modernization-spec.md"
+- id: specify
+  command: speckit.specify
+  integration: codex
+  input:
+    args: '{{ steps.load-spec.output.stdout }}'
+- id: plan
+  command: speckit.plan
+  integration: codex
+- id: tasks
+  command: speckit.tasks
+  integration: codex
+- id: implement
+  command: speckit.implement
+  integration: codex

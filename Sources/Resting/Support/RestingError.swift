@@ -2,12 +2,25 @@ import Foundation
 
 /// Canonical public failure model for request, response, and transfer operations.
 public enum RestingError: Error, LocalizedError {
+    /// A request could not be constructed from the supplied input.
     case invalidRequest(reason: String)
+
+    /// The underlying URL loading operation failed.
     case transport(URLError)
+
+    /// The final response was missing or was not an HTTP response.
     case invalidResponse
+
+    /// The final HTTP status was outside `200..<300`.
     case statusCode(Int, Data?)
+
+    /// Response decoding failed, with the original bytes when available.
     case decoding(underlying: Error, data: Data?)
+
+    /// The operation was cancelled.
     case cancelled
+
+    /// A downloaded file could not be moved or otherwise accessed.
     case fileSystem(underlying: Error)
 
     /// Localized user-facing description of the error.

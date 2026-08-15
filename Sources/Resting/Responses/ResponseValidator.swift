@@ -3,20 +3,17 @@ import Foundation
 @preconcurrency import FoundationNetworking
 #endif
 
-/// Validates HTTP responses before they are surfaced publicly.
-public struct ResponseValidator {
-    public var acceptableStatusCodes: Range<Int>
-
-    public init(acceptableStatusCodes: Range<Int> = 200..<300) {
-        self.acceptableStatusCodes = acceptableStatusCodes
+struct ResponseValidator {
+    func validate(data: Data, response: URLResponse?) throws -> HTTPURLResponse {
+        try validate(response: response) { data.isEmpty ? nil : data }
     }
 
-    func validate(data: Data, response: URLResponse) throws -> HTTPURLResponse {
+    func validate(response: URLResponse?, errorData: () -> Data?) throws -> HTTPURLResponse {
         guard let httpResponse = response as? HTTPURLResponse else {
             throw RestingError.invalidResponse
         }
-        guard acceptableStatusCodes.contains(httpResponse.statusCode) else {
-            throw RestingError.statusCode(httpResponse.statusCode, data.isEmpty ? nil : data)
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw RestingError.statusCode(httpResponse.statusCode, errorData())
         }
         return httpResponse
     }

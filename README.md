@@ -8,7 +8,7 @@ handles with isolated progress and cancellation.
 
 ## Requirements
 
-- Swift 6.2
+- Swift 6.3
 - Apple platforms supported by `Package.swift`: iOS 15+, macOS 12+, watchOS 8+, tvOS 15+, visionOS 1+
 
 ## Installation
@@ -137,6 +137,13 @@ handle.cancel()
 
 All public execution paths use the same `RestingError` model:
 
+Async, Combine, and downloads accept only final HTTP status codes in
+`200..<300`. Missing and non-HTTP responses fail with `invalidResponse`;
+other statuses retain their code and any available non-empty response bytes.
+Rejected downloads never return a file URL and their temporary files are
+removed best-effort. Async and Combine decoding failures both retain the
+original response bytes, including empty data.
+
 - `invalidRequest(reason:)`
 - `transport(URLError)`
 - `invalidResponse`
@@ -173,6 +180,13 @@ flat API.
 - Replace ad hoc request payload overloads with `.query`, `.form`, `.json`, `.jsonData`, `.raw`, and `.download`.
 - Replace client-global `download(with:completion:progress:)` plus `cancel()` with per-operation `TransferHandle` instances.
 - Replace legacy `RestingError.urlMalformed`, `wrongParameterType`, and `unknown` handling with the richer typed error cases listed above.
+- Remove references to `ResponseValidator`. Validation is now an internal,
+  fixed `200..<300` rule with no replacement customization API.
+
+`RestClient` is safe to reuse for overlapping operations. Each handle owns its
+own progress and cancellation, and releasing the client requires no explicit
+shutdown call; its session and delegate are invalidated and released
+automatically after active work finishes.
 
 ## Development Standards
 
