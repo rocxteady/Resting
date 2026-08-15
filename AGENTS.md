@@ -1,7 +1,7 @@
 @RTK.md
 
 ## Active Technologies
-- Swift 6.3 target; `Package.swift` currently uses `swift-tools-version: 6.2` and is upgraded by 002-resting-modernization + Foundation, FoundationNetworking where required by platform, Combine, XCTest; no third-party runtime dependencies planned
+- Swift 6.3 with `swift-tools-version: 6.3` + Foundation, FoundationNetworking where required by platform, Combine, XCTest; no third-party runtime dependencies
 - Swift Package Manager is authoritative; storage is limited to temporary download files and localized resources in `Sources/Resting/Resources`
 
 ## Skill and Tool Routing
@@ -14,5 +14,5 @@
 - XcodeGen is available when an Xcode project must be generated, but it MUST NOT replace `Package.swift` as the source of truth.
 
 ## Recent Changes
-- 002-resting-modernization: Added a focused follow-up specification and automated Spec Kit workflow for verified modernization gaps and the Swift 6.3 upgrade
+- 002-resting-modernization: Completed the verified download validation, client lifecycle, Combine parity, public API compatibility, Swift 6.3, and release-verification follow-up
 - 001-modernize-public-api: Completed the Swift 6.2 modernization baseline

@@ -128,6 +128,15 @@ description: "Task list for the Resting modernization follow-up"
 
 ---
 
+## Phase 8: Implementation Review Follow-Up
+
+**Purpose**: Close the two compatibility regressions found after the initial implementation review.
+
+- [X] T021 Retain `RestClient` through the shared raw Combine publisher, document the lifetime contract, and add delayed-subscription regression coverage in Sources/Resting/Client/RestClient+Combine.swift and Tests/RestingTests/Client/RestClientCombineTests.swift
+- [X] T022 Restore and document `RestClient`'s public `URLSessionDownloadDelegate` conformance by forwarding its three callbacks to the private delegate, and add a public-import compatibility regression in Sources/Resting/Client/RestClient.swift and Tests/RestingTests/Client/RestClientPublicAPICompatibilityTests.swift
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -139,6 +148,7 @@ description: "Task list for the Resting modernization follow-up"
 - **US3 (Phase 5)**: Depends on Foundational; T011 and T012 can run in parallel, then T013 implements the parity fix. Coordinate T011 with US2 because both touch `RestClientAsyncTests.swift`.
 - **US4 (Phase 6)**: Package and CI tasks can start after Foundational; documentation should be finalized after US1-US3 behavior stabilizes.
 - **Polish (Phase 7)**: Depends on all selected user stories.
+- **Review follow-up (Phase 8)**: Depends on the completed implementation and records the two post-review compatibility fixes.
 
 ### User Story Completion Order
 
@@ -146,7 +156,7 @@ description: "Task list for the Resting modernization follow-up"
 Setup -> Foundational -> US1 (MVP)
                       -> US2
                       -> US3
-US1 + US2 + US3 ------> US4 documentation -> Polish
+US1 + US2 + US3 ------> US4 documentation -> Polish -> Review follow-up
 ```
 
 - **US1 (P1)**: First deliverable because rejected downloads can surface invalid content.

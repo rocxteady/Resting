@@ -10,7 +10,7 @@ small internal rule used by async, Combine, and download execution. It accepts
 an optional response and obtains error-body data only when a non-2xx status
 needs that context.
 
-**Rationale**: The current type is public but its operation is inaccessible,
+**Rationale**: The pre-feature type was public but its operation was inaccessible,
 while its configurable status range conflicts with the fixed `200..<300`
 requirement. One internal rule prevents parity drift. Lazy error-body loading
 also preserves streaming behavior by never loading a successful download into
@@ -53,7 +53,9 @@ is already represented by the task response.
 during client initialization. The delegate owns the lock-protected
 task-identifier-to-handle registry and file callbacks, but never references the
 client. Client deinitialization requests `finishTasksAndInvalidate()` so active
-work may finish before URLSession releases its delegate.
+work may finish before URLSession releases its delegate. `RestClient` preserves
+its public `URLSessionDownloadDelegate` conformance through forwarding methods,
+but its own session installs only the private delegate.
 
 **Rationale**: Eager immutable construction removes the concurrent lazy-first-
 use race. Moving callback state to a delegate without a client back-reference
@@ -96,15 +98,19 @@ the current minimum platforms.
 - Cancel the whole session when one handle cancels. Rejected because it breaks
   operation isolation.
 
-## Decision 5: Preserve response data when Combine decoding fails
+## Decision 5: Preserve Combine response data and publisher lifecycle
 
 **Decision**: Map Combine decoding failures with the payload bytes, matching
 the existing async executor. Keep the current `RestingError` cases unchanged.
+Strongly retain the client in the shared raw publisher pipeline so stored raw,
+data, and decoded publishers remain safe to subscribe to after direct client
+references are released.
 
-**Rationale**: Combine currently maps the decoding error after discarding the
+**Rationale**: The pre-feature Combine path mapped the decoding error after discarding the
 payload context. A local catch-and-map is sufficient; the error model already
 represents decoding context, status failures, invalid responses, cancellation,
-transport, and file failures.
+transport, and file failures. One shared publisher capture preserves the session
+lifecycle for every Combine API without a custom publisher type.
 
 **Alternatives considered**:
 

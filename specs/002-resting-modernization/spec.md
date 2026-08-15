@@ -136,6 +136,9 @@ devices, then review migration guidance for the one public API removal.
 - The last external client reference is released after session creation but
   before or after operation completion; no ownership cycle keeps the client and
   session alive indefinitely.
+- A raw or data publisher is stored, the last direct client reference is
+  released, and subscription occurs later; the publisher retains the client
+  and session required to complete safely.
 - Decoding fails for empty and non-empty bodies; async and Combine preserve the
   same optional body-data context.
 
@@ -156,7 +159,8 @@ devices, then review migration guidance for the one public API removal.
   expose one consistent session lifecycle without data races.
 - **FR-006**: Session ownership MUST allow `RestClient` and its session to
   deallocate automatically after consumer ownership and active work end; no new
-  consumer-managed shutdown step may be required.
+  consumer-managed shutdown step may be required. A stored Combine publisher
+  MUST retain the client lifecycle required for delayed subscription.
 - **FR-007**: Overlapping operations MUST retain independent progress,
   cancellation, completion, and error state, including when cancellation and
   completion race.
@@ -178,14 +182,17 @@ devices, then review migration guidance for the one public API removal.
 - **FR-014**: All existing tests MUST remain green, and deterministic regression
   coverage MUST include non-2xx and non-HTTP downloads, concurrent first use,
   overlapping operations, cancellation isolation, client deallocation after
-  session creation, strict-concurrency use, and async/Combine decoding parity.
+  session creation, delayed raw-publisher subscription, public download-delegate
+  compatibility, strict-concurrency use, and async/Combine decoding parity.
 - **FR-015**: Public documentation and migration guidance MUST describe the
   download response contract, error parity, concurrency and lifecycle behavior,
   Swift 6.3 baseline, and removal of `ResponseValidator`.
 - **FR-016**: The feature MUST preserve the async/await-first API, secondary
   Combine compatibility, existing `RequestDefinition` styles,
   `ResponsePayload`, `RestingError`, `TransferHandle` behavior, deployment
-  minimums, package structure, and absence of third-party runtime dependencies.
+  minimums, package structure, `RestClient`'s public
+  `URLSessionDownloadDelegate` conformance and callbacks, and absence of
+  third-party runtime dependencies.
 - **FR-017**: Existing English and Turkish localized behavior MUST remain
   complete and consistent; any changed user-facing error text MUST be reflected
   in both localizations.
@@ -195,13 +202,14 @@ devices, then review migration guidance for the one public API removal.
 - **Public API Impact**: `ResponseValidator` is removed because its validation
   operation was inaccessible and clients could not configure it. No replacement
   customization API is introduced. All other named public surfaces in scope are
-  preserved.
+  preserved, including `RestClient`'s download-delegate conformance and methods.
 - **Migration Impact**: Guidance identifies the removed unusable type and
   explains that all supported execution and download paths use fixed default
   2xx validation.
 - **Concurrency Impact**: Concurrent first use, overlapping operations,
-  cancellation isolation, and automatic client/session release become verified
-  parts of the client contract. Consumers do not gain a shutdown obligation.
+  cancellation isolation, delayed publisher subscription, and automatic
+  client/session release become verified parts of the client contract.
+  Consumers do not gain a shutdown obligation.
 - **Platform Impact**: Current deployment minimums remain unchanged. Release
   verification covers iOS, macOS, watchOS, tvOS, and visionOS.
 - **Localization Impact**: English remains the default and Turkish remains
@@ -239,8 +247,8 @@ devices, then review migration guidance for the one public API removal.
   outcome, and zero rejected responses expose a successful file result.
 - **SC-002**: Repeated concurrent-first-use and overlapping-operation checks
   complete with zero races, duplicate resolutions, or cross-operation
-  cancellations, and each client/session pair is released after its documented
-  lifetime.
+  cancellations; stored publishers subscribe safely after direct client
+  release; and each client/session pair is released after its documented lifetime.
 - **SC-003**: For every shared failure fixture, async and Combine produce the
   same typed failure case and equivalent available status, underlying-error,
   and body-data context.

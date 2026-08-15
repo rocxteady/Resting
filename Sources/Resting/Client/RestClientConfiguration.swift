@@ -18,6 +18,12 @@ public struct RestClientConfiguration {
     public var defaultHeaders: [String: String]
 
     /// Creates a reusable client configuration.
+    ///
+    /// - Parameters:
+    ///   - sessionConfiguration: The configuration used to create the client's session.
+    ///   - decoder: The decoder used by decoded response helpers.
+    ///   - encoder: The encoder used for typed JSON request bodies.
+    ///   - defaultHeaders: Headers merged into every outgoing request.
     public init(
         sessionConfiguration: URLSessionConfiguration = .default,
         decoder: JSONDecoder = .init(),

@@ -52,6 +52,8 @@ and lack of third-party runtime dependencies.
 - Cancellation affects only the operation represented by the cancelled handle.
 - Every handle resolves at most once when cancellation and completion race.
 - Releasing the final external client reference requires no shutdown call.
+- A stored raw or data publisher retains its client before and during
+  subscription, so delayed subscription after direct client release is safe.
 - Client release gracefully invalidates its session; work already requiring the
   session may finish, after which the session and delegate deallocate.
 
@@ -62,6 +64,8 @@ and lack of third-party runtime dependencies.
   configuration is introduced.
 - Consumers that referenced the type must remove those references and rely on
   fixed default `200..<300` validation.
+- `RestClient` preserves its public `URLSessionDownloadDelegate` conformance and
+  three public delegate callbacks while its own session uses a private delegate.
 - All other named public surfaces in feature scope are preserved.
 
 ## Documentation and Localization
@@ -79,7 +83,8 @@ and lack of third-party runtime dependencies.
 - Deterministic tests cover 2xx, non-2xx with and without body data, missing or
   non-HTTP responses, rejected-file cleanup, decoding parity, concurrent first
   use, overlapping operations, cancellation isolation, exactly-once terminal
-  resolution, and eventual client/session release.
+  resolution, delayed raw-publisher subscription after direct client release,
+  public delegate compatibility, and eventual client/session release.
 - The authoritative SPM suite passes under a Swift 6.3 toolchain.
 - The package compiles for macOS and generic iOS, watchOS, tvOS, and visionOS
   destinations without selecting a named simulator.

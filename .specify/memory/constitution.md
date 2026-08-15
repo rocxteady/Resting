@@ -10,7 +10,7 @@ Removed sections:
 Templates requiring updates:
 - ✅ reviewed: no template changes required for the toolchain baseline update
 Follow-up TODOs:
-- Align `Package.swift` and CI with Swift 6.3 during 002-resting-modernization
+- None; 002-resting-modernization aligned `Package.swift` and CI with Swift 6.3
 -->
 # Resting Constitution
 

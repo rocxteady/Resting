@@ -5,12 +5,19 @@ import Foundation
 
 /// Canonical description of an outbound REST operation.
 public struct RequestDefinition {
+    /// The destination URL.
     public let url: URL
+    /// The HTTP method.
     public let method: HTTPMethod
+    /// Request-specific headers.
     public let headers: [String: String]
+    /// Query items appended to the destination URL.
     public let queryItems: [URLQueryItem]
+    /// The request body strategy.
     public let body: RequestBody
+    /// An optional request timeout override.
     public let timeout: TimeInterval?
+    /// An optional cache-policy override.
     public let cachePolicy: URLRequest.CachePolicy?
 
     let operation: Operation
@@ -21,6 +28,15 @@ public struct RequestDefinition {
     }
 
     /// Creates a fully specified request definition.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - method: The HTTP method.
+    ///   - headers: Request-specific headers.
+    ///   - queryItems: Query items appended to `url`.
+    ///   - body: The request body strategy.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
     public init(
         url: URL,
         method: HTTPMethod = .get,
@@ -61,6 +77,15 @@ public struct RequestDefinition {
     }
 
     /// Creates a query-oriented request.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - method: The HTTP method.
+    ///   - queryItems: Query items appended to `url`.
+    ///   - headers: Request-specific headers.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
+    /// - Returns: A request definition without body content.
     public static func query(
         url: URL,
         method: HTTPMethod = .get,
@@ -82,6 +107,15 @@ public struct RequestDefinition {
     }
 
     /// Creates a form-encoded request.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - method: The HTTP method.
+    ///   - fields: Fields encoded as `application/x-www-form-urlencoded`.
+    ///   - headers: Request-specific headers.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
+    /// - Returns: A form-encoded request definition.
     public static func form(
         url: URL,
         method: HTTPMethod = .post,
@@ -103,6 +137,15 @@ public struct RequestDefinition {
     }
 
     /// Creates a JSON-body request using the client's configured encoder.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - method: The HTTP method.
+    ///   - body: The value encoded when the request is built.
+    ///   - headers: Request-specific headers.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
+    /// - Returns: A JSON request definition.
     public static func json<T: Encodable>(
         url: URL,
         method: HTTPMethod = .post,
@@ -124,6 +167,15 @@ public struct RequestDefinition {
     }
 
     /// Creates a JSON-body request from already-encoded JSON data.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - method: The HTTP method.
+    ///   - body: The encoded JSON data.
+    ///   - headers: Request-specific headers.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
+    /// - Returns: A JSON-data request definition.
     public static func jsonData(
         url: URL,
         method: HTTPMethod = .post,
@@ -145,6 +197,16 @@ public struct RequestDefinition {
     }
 
     /// Creates a raw-body request with an explicit content type.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - method: The HTTP method.
+    ///   - body: The raw request bytes.
+    ///   - contentType: The body media type.
+    ///   - headers: Request-specific headers.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
+    /// - Returns: A raw-body request definition.
     public static func raw(
         url: URL,
         method: HTTPMethod = .post,
@@ -167,6 +229,13 @@ public struct RequestDefinition {
     }
 
     /// Creates a download-oriented request.
+    ///
+    /// - Parameters:
+    ///   - url: The destination URL.
+    ///   - headers: Request-specific headers.
+    ///   - timeout: An optional request timeout override.
+    ///   - cachePolicy: An optional cache-policy override.
+    /// - Returns: A GET request configured for download execution.
     public static func download(
         url: URL,
         headers: [String: String] = [:],

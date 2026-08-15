@@ -71,6 +71,8 @@ new public model.
 - One `RestClient` owns one session and delegate.
 - URLSession retains the delegate until invalidation.
 - The delegate owns active transfer routing state, not the client.
+- A stored Combine publisher retains the client until the publisher and active
+  subscription are released.
 
 **Validation rules**:
 
@@ -78,6 +80,7 @@ new public model.
   callers.
 - Concurrent first use observes the same session identity.
 - The delegate never retains the client.
+- Delayed subscription remains safe after direct client references are released.
 - Releasing the final client reference begins graceful session invalidation;
   no consumer shutdown call is required.
 - Active operations may keep their required session/delegate state until they

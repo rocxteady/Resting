@@ -12,14 +12,17 @@ download before moving its temporary file; preserve response data on decoding
 failures; and replace the racy, self-delegating lazy session with one eagerly
 created session plus a private lock-protected download delegate. Upgrade the
 manifest and release checks to Swift 6.3 while preserving the existing public
-surface except for removal of the unusable `ResponseValidator` type.
+surface except for removal of the unusable `ResponseValidator` type. Preserve
+`RestClient`'s public download-delegate conformance through forwarding methods,
+and retain the client through stored Combine publishers so delayed subscription
+cannot use an invalidated session.
 
 ## Technical Context
 
-**Language/Version**: Swift 6.3; `Package.swift` currently declares Swift tools 6.2 and will move to 6.3  
+**Language/Version**: Swift 6.3; `Package.swift` declares Swift tools 6.3
 **Primary Dependencies**: Foundation, FoundationNetworking where required by platform, Combine, XCTest; no third-party runtime dependencies  
 **Storage**: Temporary download files plus localized resources under `Sources/Resting/Resources`; no persistent store  
-**Testing**: XCTest with deterministic `URLProtocol` fixtures, async/cancellation/lifetime regressions, Combine parity checks, and generic Apple-platform compilation  
+**Testing**: XCTest with deterministic `URLProtocol` fixtures, async/cancellation/lifetime regressions, delayed Combine subscription, public API compatibility checks, and generic Apple-platform compilation
 **Target Platform**: iOS 15+, macOS 12+, watchOS 8+, tvOS 15+, and visionOS 1+  
 **Project Type**: Swift Package library  
 **Performance Goals**: Preserve streaming download behavior, avoid reading successful downloads into memory, and resolve every operation exactly once under overlap or cancellation  
@@ -100,7 +103,10 @@ Tests/RestingTests/
 
 **Structure Decision**: Keep the established single-target domain layout.
 Implement the private download delegate beside `RestClient` because it exists
-only to provide that client's URLSession ownership boundary. Retain
+only to provide that client's URLSession ownership boundary. Keep the client's
+public delegate conformance as forwarding compatibility methods without making
+it the session's retained delegate. Retain the client in the shared raw Combine
+publisher pipeline so every derived publisher supports delayed subscription. Keep
 `ResponseValidator.swift` as the internal shared rule rather than duplicating
 guards across execution styles. Add no source folder, package target, or
 standalone migration document.

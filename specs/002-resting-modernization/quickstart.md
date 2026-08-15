@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Repository checked out on branch `002-resting-modernization`
+- Repository checked out at a revision containing 002-resting-modernization
 - Xcode 26.4 or newer with Swift 6.3 and all declared Apple platform SDKs
 - `xcodebuildmcp` available for local package verification
 
@@ -26,7 +26,8 @@ rtk xcodebuildmcp swift-package test \
 
 Expected: all existing and feature regression tests pass, including response
 parity, download validation and cleanup, concurrent first use, cancellation
-isolation, and lifecycle release.
+isolation, delayed raw-publisher subscription, public delegate compatibility,
+and lifecycle release.
 
 ## 3. Verify a release package build
 
@@ -61,6 +62,8 @@ Confirm `README.md` states:
 - rejected downloads never surface a successful file;
 - decoding failures preserve available body data across async and Combine;
 - one client supports overlapping work and releases its session automatically;
+- stored raw and data publishers remain subscribable after direct client release;
+- `RestClient` preserves its public download-delegate compatibility surface;
 - `ResponseValidator` was removed with no replacement customization API.
 
 Expected: an adopter can understand behavior and migration without inspecting

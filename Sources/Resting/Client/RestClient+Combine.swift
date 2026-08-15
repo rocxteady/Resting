@@ -39,6 +39,8 @@ extension RestClient {
     /// - Parameter request: The request to execute.
     /// - Returns: A publisher that emits bytes for a `200..<300` response or a
     ///   typed `RestingError`.
+    /// - Note: The publisher retains this client while it or an active
+    ///   subscription is retained.
     public func dataPublisher(for request: RequestDefinition) -> AnyPublisher<Data, RestingError> {
         publisher(for: request)
             .map(\.value)
@@ -52,6 +54,8 @@ extension RestClient {
     ///   - type: The response value type.
     /// - Returns: A publisher that emits the decoded value or a typed
     ///   `RestingError`; decoding failures retain the original response bytes.
+    /// - Note: The publisher retains this client while it or an active
+    ///   subscription is retained.
     public func publisher<T: Decodable>(
         for request: RequestDefinition,
         as type: T.Type = T.self

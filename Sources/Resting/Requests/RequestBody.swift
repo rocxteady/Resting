@@ -2,10 +2,15 @@ import Foundation
 
 /// Represents the supported request body strategies.
 public enum RequestBody {
+    /// A request without body content.
     case none
+    /// Form fields encoded as `application/x-www-form-urlencoded`.
     case form([String: String])
+    /// A typed value encoded with the client's JSON encoder.
     case json(JSONBody)
+    /// JSON data that is already encoded.
     case jsonData(Data)
+    /// Raw bytes with their explicit content type.
     case raw(Data, contentType: String)
 
     /// Wraps an `Encodable` value so it can be encoded later with the client's encoder.
@@ -13,6 +18,8 @@ public enum RequestBody {
         private let encodeBody: (JSONEncoder) throws -> Data
 
         /// Stores a typed JSON payload for later encoding.
+        ///
+        /// - Parameter value: The value to encode when the request is built.
         public init<T: Encodable>(_ value: T) {
             self.encodeBody = { encoder in
                 try encoder.encode(value)

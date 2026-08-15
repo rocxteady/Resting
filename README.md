@@ -26,6 +26,7 @@ dependencies: [
 Import the package and configure a client:
 
 ```swift
+import Foundation
 import Resting
 
 let configuration = RestClientConfiguration(
@@ -93,6 +94,10 @@ let raw = RequestDefinition.raw(
 Combine remains available as a secondary surface when an app still needs
 publisher-based integration:
 
+Returned publishers retain their client while the publisher or an active
+subscription is retained, so a stored publisher remains safe to subscribe to
+after other client references are released.
+
 ```swift
 import Combine
 
@@ -132,6 +137,10 @@ Cancellation is per handle:
 ```swift
 handle.cancel()
 ```
+
+For source compatibility, `RestClient` retains its public
+`URLSessionDownloadDelegate` conformance and callbacks while using a private
+delegate for its own session lifecycle.
 
 ## Error Handling
 

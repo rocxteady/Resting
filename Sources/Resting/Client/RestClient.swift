@@ -19,6 +19,8 @@ public final class RestClient: NSObject, @unchecked Sendable {
     }
 
     /// Creates a client from a reusable configuration value.
+    ///
+    /// - Parameter configuration: The session, coding, and default-header configuration.
     public init(configuration: RestClientConfiguration = .init()) {
         let downloadDelegate = RestClientDownloadDelegate()
         self.configuration = configuration
@@ -127,6 +129,13 @@ public final class RestClient: NSObject, @unchecked Sendable {
 
 extension RestClient: URLSessionDownloadDelegate {
     /// Forwards download progress to the transfer registered for the task.
+    ///
+    /// - Parameters:
+    ///   - session: The session reporting progress.
+    ///   - downloadTask: The download task reporting progress.
+    ///   - bytesWritten: The bytes written since the previous callback.
+    ///   - totalBytesWritten: The total bytes written so far.
+    ///   - totalBytesExpectedToWrite: The expected response size, when known.
     public func urlSession(
         _ session: URLSession,
         downloadTask: URLSessionDownloadTask,
@@ -144,6 +153,11 @@ extension RestClient: URLSessionDownloadDelegate {
     }
 
     /// Forwards a downloaded temporary file to the transfer registered for the task.
+    ///
+    /// - Parameters:
+    ///   - session: The session that completed the download.
+    ///   - downloadTask: The completed download task.
+    ///   - location: The temporary downloaded file.
     public func urlSession(
         _ session: URLSession,
         downloadTask: URLSessionDownloadTask,
@@ -157,6 +171,11 @@ extension RestClient: URLSessionDownloadDelegate {
     }
 
     /// Forwards task completion to the transfer registered for the task.
+    ///
+    /// - Parameters:
+    ///   - session: The session that completed the task.
+    ///   - task: The completed task.
+    ///   - error: The transport error, or `nil` for successful completion.
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         downloadDelegate.urlSession(session, task: task, didCompleteWithError: error)
     }
